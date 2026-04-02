@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Karaagechan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body,#root{height:100%;}
+    body{font-family:'Nunito',sans-serif;color:#4A3F55;background:#FDF6FF;min-height:100vh;}
+
+    @keyframes kc-burst{0%{transform:rotate(var(--a)) translateY(0) scale(1.2);opacity:1;}55%{opacity:1;}100%{transform:rotate(var(--a)) translateY(-24px) scale(0);opacity:0;}}
+    @keyframes kc-pop{0%{transform:scale(1);}40%{transform:scale(1.35);}100%{transform:scale(1);}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes shimmer{0%{opacity:.6;}50%{opacity:1;}100%{opacity:.6;}}
+
+    /* HEADER */
+    .hdr{position:sticky;top:0;z-index:100;background:rgba(253,246,255,.94);backdrop-filter:blur(10px);border-bottom:1.5px solid #EAE0F5;height:54px;display:flex;align-items:center;gap:14px;padding:0 20px;}
+    .burger{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:7px;border-radius:8px;transition:background .15s;}
+    .burger:hover{background:#F5EFFE;}
+    .burger span{display:block;width:20px;height:2px;background:#C9A8E0;border-radius:2px;}
+    .logo{font-size:1.2rem;font-weight:800;color:#C9A8E0;cursor:pointer;letter-spacing:-.01em;}
+    .logo:hover{color:#B890D4;}
+
+    /* DRAWER */
+    .drawer{position:fixed;top:0;left:0;height:100vh;width:220px;background:#fff;border-right:1.5px solid #EAE0F5;box-shadow:6px 0 28px rgba(180,140,220,.13);padding:22px 16px;z-index:201;transform:translateX(-100%);transition:transform .3s cubic-bezier(.22,.8,.25,1);}
+    .drawer.open{transform:translateX(0);}
+    .d-logo{font-size:1.05rem;font-weight:800;color:#C9A8E0;margin-bottom:24px;padding-bottom:14px;border-bottom:1.5px solid #EAE0F5;}
+    .d-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;font-size:.87rem;font-weight:600;color:#4A3F55;cursor:pointer;transition:background .12s;border:none;background:none;width:100%;text-align:left;font-family:'Nunito',sans-serif;}
+    .d-item:hover{background:#F5EFFE;}
+    .d-item.active{background:#EDE0F8;color:#9060C0;}
+    .d-item.dim{color:#9B8FAA;cursor:default;}
+    .d-item.dim:hover{background:none;}
+
+    /* DOT BG */
+    .dot-bg{background-image:radial-gradient(circle,#D4C0E8 1px,transparent 1px);background-size:28px 28px;}
+
+    /* HOME */
+    .home-wrap{min-height:calc(100vh - 54px);display:flex;flex-direction:column;padding:0 40px 40px;}
+    .home-date-section{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px 36px;animation:fadeInUp .5s ease both;}
+    .greeting{font-size:1rem;font-weight:600;color:#9B8FAA;letter-spacing:.06em;margin-bottom:8px;}
+    .year-label{font-size:1.1rem;font-weight:700;color:#B09AC8;margin-bottom:4px;}
+    .big-date{font-size:clamp(3.5rem,10vw,6rem);font-weight:900;color:#3A2F45;letter-spacing:-.03em;line-height:1;margin-bottom:12px;}
+    .holiday-badge{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:700;color:#A060C8;background:#EDE0F8;padding:4px 14px;border-radius:20px;border:1.5px solid #D4B8F0;}
+    .home-bottom{flex:1;display:grid;grid-template-columns:1.5fr 1fr;gap:20px;max-width:920px;width:100%;margin:0 auto;animation:fadeInUp .5s .15s ease both;}
+
+    /* WEATHER CARD */
+    .weather-card{background:linear-gradient(135deg,#C8E6FF 0%,#B8DAFF 60%,#CEB8F8 100%);border-radius:24px;padding:22px 22px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;border:1.5px solid rgba(255,255,255,.6);box-shadow:0 4px 24px rgba(170,200,255,.3);}
+    .weather-card::before{content:"";position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(255,255,255,.18);border-radius:50%;}
+    .weather-card-label{font-size:.72rem;font-weight:700;color:rgba(60,80,140,.65);letter-spacing:.08em;text-transform:uppercase;}
+    .weather-current{display:flex;align-items:center;gap:12px;}
+    .weather-icon{font-size:2.4rem;line-height:1;}
+    .weather-temp{font-size:2.4rem;font-weight:900;color:#2A3A6A;line-height:1;letter-spacing:-.02em;}
+    .weather-temp span{font-size:1.1rem;font-weight:700;margin-left:2px;}
+    .weather-desc{font-size:.9rem;font-weight:700;color:#3A4A80;}
+    .weather-sub{display:flex;gap:10px;flex-wrap:wrap;}
+    .weather-chip{background:rgba(255,255,255,.5);border-radius:10px;padding:4px 10px;font-size:.75rem;font-weight:700;color:#3A4A80;}
+    .forecast-row{display:flex;gap:6px;margin-top:2px;}
+    .fc-card{flex:1;background:rgba(255,255,255,.38);border-radius:12px;padding:7px 6px;text-align:center;display:flex;flex-direction:column;gap:2px;}
+    .fc-day{font-size:.65rem;font-weight:700;color:rgba(60,80,140,.7);}
+    .fc-icon{font-size:1.1rem;line-height:1.2;}
+    .fc-temp{font-size:.7rem;font-weight:700;color:#2A3A6A;}
+    .weather-loading,.weather-error{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:8px;color:rgba(60,80,140,.6);font-size:.88rem;font-weight:600;}
+    .weather-location{font-size:.7rem;font-weight:600;color:rgba(60,80,140,.55);}
+    .weather-retry{background:rgba(255,255,255,.5);border:none;border-radius:8px;padding:5px 12px;font-size:.78rem;font-weight:700;color:#3A4A80;cursor:pointer;font-family:'Nunito',sans-serif;}
+
+    /* HOME RIGHT */
+    .home-right{display:flex;flex-direction:column;gap:14px;}
+    .action-btn{background:#C9A8E0;color:#fff;border:none;border-radius:18px;padding:20px 22px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .18s;box-shadow:0 4px 16px rgba(201,168,224,.4);text-align:left;}
+    .action-btn:hover{background:#B890D4;transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,224,.5);}
+    .action-btn-sub{font-size:.72rem;font-weight:600;opacity:.8;margin-top:2px;}
+    .action-space{flex:1;border:2px dashed #DDD0ED;border-radius:18px;display:flex;align-items:center;justify-content:center;color:#C8BAD8;font-size:.8rem;font-weight:600;min-height:80px;}
+
+    /* CALENDAR+TODO LAYOUT */
+    .layout{display:flex;min-height:calc(100vh - 54px);}
+    .left-panel{width:33%;min-width:280px;max-width:440px;flex-shrink:0;display:flex;flex-direction:column;background:#fff;border-right:1.5px solid #EAE0F5;overflow-y:auto;}
+
+    /* CALENDAR */
+    .cal-section{padding:14px 14px 10px;}
+    .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .cal-arr{background:#EDE0F8;border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:.9rem;color:#C9A8E0;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .14s;}
+    .cal-arr:hover{background:#C9A8E0;color:#fff;}
+    .cal-lbl{font-size:.88rem;font-weight:700;background:#F5EFFE;border:1.5px solid #EAE0F5;padding:4px 12px;border-radius:20px;}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+    .cal-dh{text-align:center;font-size:.62rem;font-weight:700;color:#9B8FAA;padding:3px 0;}
+    .cal-dh:first-child{color:#E07070;}.cal-dh:last-child{color:#709AE0;}
+    .cal-cell{aspect-ratio:1;border-radius:7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.73rem;font-weight:700;gap:1px;transition:background .12s;}
+    .cal-cell:hover{background:#F5EFFE;}
+    .cal-cell.empty{cursor:default;pointer-events:none;}
+    .cal-cell.today-c:not(.sel){background:#E8D5F5;}
+    .cal-cell.sel{background:#C9A8E0;color:#fff;border-radius:9px;}
+
+    /* TIMER */
+    .timer-section{border-top:1.5px solid #EAE0F5;padding:12px 14px 16px;display:flex;flex-direction:column;gap:10px;}
+    .timer-tabs{display:flex;background:#F0E8FA;border-radius:12px;padding:3px;gap:3px;}
+    .timer-tab{flex:1;border:none;border-radius:9px;padding:7px 0;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .18s;background:transparent;color:#9B8FAA;}
+    .timer-tab.on{background:#fff;color:#7A50A0;box-shadow:0 2px 8px rgba(180,140,220,.2);}
+    .pom-badge{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:20px;align-self:center;}
+    .pom-badge.work{background:#EDE0F8;color:#9060C0;}.pom-badge.brk{background:#E0F5EB;color:#2E9860;}
+    .timer-display{text-align:center;font-size:clamp(2rem,4.5vw,2.8rem);font-weight:900;color:#2A2035;letter-spacing:.02em;line-height:1;font-variant-numeric:tabular-nums;}
+    .pom-bar-wrap{background:#F0E8FA;border-radius:4px;height:4px;overflow:hidden;}
+    .pom-bar-fill{height:100%;background:linear-gradient(90deg,#C9A8E0,#A880D0);border-radius:4px;transition:width 1s linear;}
+    .pom-cycles{text-align:center;font-size:.68rem;font-weight:600;color:#B09AC8;}
+    .timer-controls{display:flex;gap:7px;justify-content:center;}
+    .tc-btn{border:none;border-radius:10px;padding:7px 16px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .14s;}
+    .tc-primary{background:#C9A8E0;color:#fff;}.tc-primary:hover{background:#B890D4;}
+    .tc-secondary{background:#F0E8FA;color:#9060C0;}.tc-secondary:hover{background:#E0D0F5;}
+
+    /* TIMER CATEGORIES */
+    .tc-section{border-top:1px dashed #EAE0F5;padding-top:8px;}
+    .tc-section-label{font-size:.68rem;font-weight:700;color:#B09AC8;letter-spacing:.04em;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+    .tc-pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px;}
+    .tc-pill{border:1.5px solid transparent;border-radius:16px;padding:3px 9px;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .12s;background:none;font-family:'Nunito',sans-serif;display:flex;align-items:center;gap:4px;}
+    .tc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+    .tc-add-btn{border:1.5px dashed #D4C0E8;border-radius:16px;padding:3px 9px;font-size:.68rem;font-weight:700;color:#C9A8E0;background:none;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .12s;}
+    .tc-add-btn:hover{background:#F5EFFE;}
+    .tc-form{background:#FAF5FF;border-radius:9px;padding:8px;border:1.5px solid #EAE0F5;display:flex;flex-direction:column;gap:7px;}
+    .tc-form input{border:1.5px solid #EAE0F5;border-radius:7px;padding:5px 9px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:600;color:#4A3F55;outline:none;background:#fff;}
+    .tc-form input:focus{border-color:#C9A8E0;}
+    .swatches{display:flex;gap:5px;flex-wrap:wrap;}
+    .swatch{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .12s;}
+    .swatch.picked{border-color:#333;transform:scale(1.15);}
+    .tc-form-actions{display:flex;gap:5px;}
+    .nc-save{background:#C9A8E0;color:#fff;border:none;border-radius:7px;padding:4px 12px;font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;}
+    .nc-cancel{background:#F0E8FA;color:#9B8FAA;border:none;border-radius:7px;padding:4px 12px;font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;}
+    .tc-pill-wrap{position:relative;display:inline-flex;align-items:center;}
+    .tc-pill-del{position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:50%;background:#D85050;color:#fff;border:none;cursor:pointer;font-size:8px;display:none;align-items:center;justify-content:center;font-weight:700;line-height:1;padding:0;}
+    .tc-pill-wrap:hover .tc-pill-del{display:flex;}
+    .timer-total{text-align:center;font-size:.68rem;font-weight:600;color:#C0B0D0;letter-spacing:.03em;}
+
+    /* TODO PANEL */
+    .todo-panel{flex:1;padding:20px 20px;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+    .todo-hdr{margin-bottom:14px;}
+    .todo-date{font-size:1rem;font-weight:700;}
+    .todo-stat{font-size:.75rem;color:#9B8FAA;margin-top:3px;font-weight:500;}
+    .todo-scroll{flex:1;overflow-y:auto;margin-bottom:14px;min-height:0;}
+    .cat-sec{margin-bottom:12px;}
+    .cat-hdr{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:20px;margin-bottom:6px;}
+    .cat-dot-sm{width:5px;height:5px;border-radius:50%;display:inline-block;}
+    .t-item{background:#fff;border:1.5px solid #EAE0F5;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:9px;margin-bottom:5px;position:relative;transition:border-color .14s,box-shadow .14s;}
+    .t-item:hover{border-color:#C9A8E0;box-shadow:0 2px 8px rgba(201,168,224,.13);}
+    .t-item.done-i{background:#F5EFFE;}
+    .chk{width:22px;height:22px;border-radius:6px;border:2px solid #C9A8E0;background:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .14s;}
+    .chk.on{background:#C9A8E0;border-color:#C9A8E0;animation:kc-pop .3s ease;}
+    .chk svg{display:none;}.chk.on svg{display:block;}
+    .cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:opacity .15s;}
+    .t-txt{flex:1;font-size:.85rem;font-weight:600;}
+    .t-txt.done{text-decoration:line-through;color:#9B8FAA;}
+    .del{background:none;border:none;cursor:pointer;color:#9B8FAA;font-size:.85rem;padding:3px 6px;border-radius:6px;transition:all .12s;}
+    .del:hover{background:#FFE8E8;color:#D85050;}
+    .empty-st{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9B8FAA;font-size:.84rem;gap:10px;padding:52px 0;}
+    .add-area{background:#fff;border:1.5px solid #EAE0F5;border-radius:14px;padding:11px 13px;display:flex;flex-direction:column;gap:9px;}
+    .add-row{display:flex;gap:8px;align-items:center;}
+    .add-inp{flex:1;border:none;outline:none;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:600;color:#4A3F55;background:transparent;}
+    .add-inp::placeholder{color:#C8BAD8;font-weight:500;}
+    .add-btn{background:#C9A8E0;color:#fff;border:none;border-radius:10px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .14s;white-space:nowrap;}
+    .add-btn:hover{background:#B890D4;}.add-btn:active{transform:scale(.94);}
+    .cat-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+    .c-pill{border:1.5px solid transparent;border-radius:20px;padding:2px 9px;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .12s;background:none;font-family:'Nunito',sans-serif;}
+    .add-cat-btn{border:1.5px dashed #D4C0E8;border-radius:20px;padding:2px 9px;font-size:.68rem;font-weight:700;color:#C9A8E0;background:none;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .12s;white-space:nowrap;}
+    .add-cat-btn:hover{background:#F5EFFE;}
+    .new-cat-form{display:flex;flex-direction:column;gap:7px;padding:9px;background:#FAF5FF;border-radius:10px;border:1.5px solid #EAE0F5;}
+    .new-cat-form input{border:1.5px solid #EAE0F5;border-radius:8px;padding:5px 9px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:600;color:#4A3F55;outline:none;background:#fff;}
+    .new-cat-form input:focus{border-color:#C9A8E0;}
+    .color-swatches{display:flex;gap:5px;flex-wrap:wrap;}
+    .color-swatch{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .12s;}
+    .color-swatch.picked{border-color:#333;transform:scale(1.15);}
+    .new-cat-actions{display:flex;gap:5px;}
+    .c-pill-wrap{position:relative;display:inline-flex;align-items:center;}
+    .c-pill-del{position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:50%;background:#D85050;color:#fff;border:none;cursor:pointer;font-size:8px;display:none;align-items:center;justify-content:center;font-weight:700;line-height:1;padding:0;}
+    .c-pill-wrap:hover .c-pill-del{display:flex;}
+
+    /* STATS */
+    .stats-wrap{padding:24px 28px;min-height:calc(100vh - 54px);animation:fadeInUp .4s ease both;}
+    .stats-title{font-size:1.3rem;font-weight:800;color:#3A2F45;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+    .stats-period-tabs{display:flex;background:#F0E8FA;border-radius:14px;padding:3px;gap:3px;width:fit-content;margin-bottom:20px;}
+    .sp-tab{border:none;background:transparent;border-radius:11px;padding:7px 22px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;color:#9B8FAA;cursor:pointer;transition:all .18s;}
+    .sp-tab.on{background:#fff;color:#7A50A0;box-shadow:0 2px 8px rgba(180,140,220,.2);}
+    .stats-body{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
+    .chart-card{background:#fff;border-radius:20px;padding:20px;border:1.5px solid #EAE0F5;}
+    .chart-title{font-size:.78rem;font-weight:700;color:#9B8FAA;margin-bottom:12px;letter-spacing:.04em;}
+    .chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+    .legend-item{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:#6A5F75;}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .chart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0;color:#C0B0D0;font-size:.84rem;font-weight:600;gap:8px;}
+    .stats-right{display:flex;flex-direction:column;gap:12px;}
+    .stats-summary{background:#fff;border-radius:20px;padding:16px 18px;border:1.5px solid #EAE0F5;}
+    .stats-summary-title{font-size:.72rem;font-weight:700;color:#9B8FAA;letter-spacing:.04em;margin-bottom:10px;}
+    .sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #F5F0FA;}
+    .sum-row:last-child{border-bottom:none;}
+    .sum-label{font-size:.78rem;font-weight:600;color:#6A5F75;}
+    .sum-value{font-size:.88rem;font-weight:800;color:#4A3F55;}
+    .streak-card{background:linear-gradient(135deg,#F5EFFE,#EDE0F8);border-radius:20px;padding:16px 18px;border:1.5px solid #D4B8F0;text-align:center;}
+    .streak-num{font-size:2.4rem;font-weight:900;color:#7A50A0;line-height:1;}
+    .streak-label{font-size:.75rem;font-weight:600;color:#9B8FAA;margin-top:2px;}
+    .quote-card{background:#fff;border-radius:20px;padding:16px 18px;border:1.5px solid #EAE0F5;}
+    .quote-text{font-size:.82rem;font-weight:700;color:#4A3F55;line-height:1.6;font-style:italic;}
+    .quote-author{font-size:.68rem;font-weight:600;color:#B09AC8;margin-top:6px;text-align:right;}
+    .achievements{background:#fff;border-radius:20px;padding:16px 18px;border:1.5px solid #EAE0F5;}
+    .ach-title{font-size:.72rem;font-weight:700;color:#9B8FAA;letter-spacing:.04em;margin-bottom:10px;}
+    .ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+    .ach-item{border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:7px;border:1.5px solid #EAE0F5;}
+    .ach-item.unlocked{background:#F5EFFE;border-color:#D4B8F0;}
+    .ach-item.locked{background:#FAFAFA;opacity:.55;}
+    .ach-icon{font-size:1.2rem;}
+    .ach-name{font-size:.68rem;font-weight:700;color:#4A3F55;}
+    .ach-desc{font-size:.6rem;font-weight:500;color:#9B8FAA;margin-top:1px;}
+
+    @media(max-width:700px){
+      .layout{flex-direction:column;}
+      .left-panel{width:100%;max-width:100%;border-right:none;border-bottom:1.5px solid #EAE0F5;}
+      .home-bottom,.stats-body{grid-template-columns:1fr;}
+      .home-wrap{padding:0 16px 32px;}
+      .stats-wrap{padding:16px;}
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+/* ── CONSTANTS ── */
+const DEFAULT_TODO_CATS = [
+  {id:"study",label:"勉強",  color:"#4FA8F5",bg:"#E3EFFF"},
+  {id:"hobby",label:"趣味",  color:"#D4A000",bg:"#FFF7D0"},
+  {id:"life", label:"生活",  color:"#2EB87A",bg:"#E0F5EB"},
+  {id:"work", label:"仕事",  color:"#F0508A",bg:"#FFE8EF"},
+  {id:"other",label:"その他",color:"#8888B0",bg:"#F0F0FA"},
+];
+const COLOR_PRESETS = [
+  {color:"#E87B4A",bg:"#FFF0E8"},{color:"#9B59B6",bg:"#F5E8FF"},
+  {color:"#1ABC9C",bg:"#E0FBF5"},{color:"#E74C3C",bg:"#FFE8E8"},
+  {color:"#3498DB",bg:"#E8F4FF"},{color:"#F39C12",bg:"#FFF8E1"},
+  {color:"#E91E8C",bg:"#FFE8F5"},{color:"#4CAF50",bg:"#E8F5E9"},
+];
+const DAYS_SHORT = ["日","月","火","水","木","金","土"];
+const JP_HOLIDAYS = {
+  "2025-01-01":"元日","2025-01-13":"成人の日","2025-02-11":"建国記念の日",
+  "2025-02-23":"天皇誕生日","2025-03-20":"春分の日","2025-04-29":"昭和の日",
+  "2025-05-03":"憲法記念日","2025-05-04":"みどりの日","2025-05-05":"こどもの日",
+  "2025-07-21":"海の日","2025-08-11":"山の日","2025-09-15":"敬老の日",
+  "2025-09-23":"秋分の日","2025-10-13":"スポーツの日","2025-11-03":"文化の日",
+  "2025-11-23":"勤労感謝の日",
+  "2026-01-01":"元日","2026-01-12":"成人の日","2026-02-11":"建国記念の日",
+  "2026-02-23":"天皇誕生日","2026-03-20":"春分の日","2026-04-29":"昭和の日",
+  "2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日",
+  "2026-07-20":"海の日","2026-08-11":"山の日","2026-09-21":"敬老の日",
+  "2026-09-23":"秋分の日","2026-10-12":"スポーツの日","2026-11-03":"文化の日",
+  "2026-11-23":"勤労感謝の日",
+};
+const QUOTES = [
+  {text:"千里の道も一歩から。",author:"老子"},
+  {text:"継続は力なり。",author:"日本のことわざ"},
+  {text:"やってみせ、言って聞かせて、させてみせ、ほめてやらねば、人は動かじ。",author:"山本五十六"},
+  {text:"明日やろうはバカ野郎。",author:"日本のことわざ"},
+  {text:"人生は一度きり。今日が残りの人生の最初の日だ。",author:"アビー・ホフマン"},
+  {text:"小さなことを重ねることが、とんでもないところへ行くただひとつの道。",author:"イチロー"},
+  {text:"努力は必ず報われる。もし報われない努力があるなら、それはまだ努力と呼べない。",author:"王貞治"},
+  {text:"夢を持ち、あきらめない。それだけで人生は変わる。",author:"岡本太郎"},
+];
+
+/* ── UTILS ── */
+const getDIM = (y,m) => new Date(y,m+1,0).getDate();
+const getFD  = (y,m) => new Date(y,m,1).getDay();
+const toKey  = (y,m,d) => `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+const todayStr = () => { const t=new Date(); return toKey(t.getFullYear(),t.getMonth(),t.getDate()); };
+const fmtMS  = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+const fmtHMS = s => `${String(Math.floor(s/3600)).padStart(2,"0")}:${String(Math.floor((s%3600)/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+const fmtHM  = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?`${h}時間${m}分`:`${m}分`; };
+const getGreeting = () => { const h=new Date().getHours(); return h<4?"こんばんは":h<10?"おはようございます":h<17?"こんにちは":"こんばんは"; };
+
+function weatherInfo(code) {
+  if(code===0)return{label:"快晴",emoji:"☀️"};if(code<=2)return{label:"晴れ",emoji:"🌤️"};
+  if(code===3)return{label:"曇り",emoji:"☁️"};if(code<=48)return{label:"霧",emoji:"🌫️"};
+  if(code<=55)return{label:"霧雨",emoji:"🌦️"};if(code<=65)return{label:"雨",emoji:"🌧️"};
+  if(code<=77)return{label:"雪",emoji:"❄️"};if(code<=82)return{label:"にわか雨",emoji:"🌦️"};
+  return{label:"雷雨",emoji:"⛈️"};
+}
+
+/* ── Fixed: ✕ only for PAST dates ── */
+function getDayStatus(list, dateKey) {
+  if (!list?.length) return null;
+  const done = list.filter(t => t.done).length;
+  if (done === list.length) return "circle";
+  if (done > 0) return "tri";
+  if (dateKey < todayStr()) return "cross"; // past dates only
+  return null;
+}
+
+/* ── Streak ── */
+function calcStreak(timerLog) {
+  const today = new Date();
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = toKey(d.getFullYear(), d.getMonth(), d.getDate());
+    const dayTotal = Object.values(timerLog[key] || {}).reduce((a,b)=>a+b,0);
+    if (dayTotal > 0) streak++;
+    else if (i > 0) break; // don't break on today (might not have started yet)
+  }
+  return streak;
+}
+
+/* ── Timer log helpers ── */
+function getTotalForPeriod(timerLog, period) {
+  const today = new Date();
+  let total = 0;
+  let days = period === "week" ? 7 : period === "month" ? 31 : 366;
+  if (period === "all") {
+    return Object.values(timerLog).reduce((sum, day) => {
+      return sum + Object.values(day).reduce((a,b) => a+b, 0);
+    }, 0);
+  }
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today);
+    if (period === "week") { const wd = today.getDay(); d.setDate(today.getDate() - wd + i); if (i > wd + (6-wd)) continue; }
+    else if (period === "month") { d.setDate(today.getDate() - i); }
+    else { d.setDate(today.getDate() - i); if (d.getFullYear() !== today.getFullYear()) continue; }
+    const key = toKey(d.getFullYear(), d.getMonth(), d.getDate());
+    total += Object.values(timerLog[key] || {}).reduce((a,b)=>a+b,0);
+  }
+  return total;
+}
+
+function getWeekTotal(timerLog) {
+  const today = new Date(), wd = today.getDay();
+  let total = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - wd + i);
+    const key = toKey(d.getFullYear(), d.getMonth(), d.getDate());
+    total += Object.values(timerLog[key] || {}).reduce((a,b)=>a+b,0);
+  }
+  return total;
+}
+
+function getMonthTotal(timerLog) {
+  const today = new Date();
+  let total = 0;
+  for (let d = 1; d <= getDIM(today.getFullYear(), today.getMonth()); d++) {
+    const key = toKey(today.getFullYear(), today.getMonth(), d);
+    total += Object.values(timerLog[key] || {}).reduce((a,b)=>a+b,0);
+  }
+  return total;
+}
+
+function getYearTotal(timerLog) {
+  const today = new Date();
+  return Object.entries(timerLog).filter(([k]) => k.startsWith(`${today.getFullYear()}-`))
+    .reduce((sum, [,v]) => sum + Object.values(v).reduce((a,b)=>a+b,0), 0);
+}
+
+function getAllTotal(timerLog) {
+  return Object.values(timerLog).reduce((sum, day) => sum + Object.values(day).reduce((a,b)=>a+b,0), 0);
+}
+
+/* ── Chart data ── */
+function buildChartData(timerLog, timerCats, period) {
+  const today = new Date();
+  let items = [];
+  
+  if (period === "week") {
+    const wd = today.getDay();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - wd + i);
+      const key = toKey(d.getFullYear(), d.getMonth(), d.getDate());
+      const dayData = timerLog[key] || {};
+      items.push({ label: DAYS_SHORT[i], key, data: dayData });
+    }
+  } else if (period === "month") {
+    const dim = getDIM(today.getFullYear(), today.getMonth());
+    for (let d = 1; d <= dim; d++) {
+      const key = toKey(today.getFullYear(), today.getMonth(), d);
+      const dayData = timerLog[key] || {};
+      items.push({ label: `${d}`, key, data: dayData });
+    }
+  } else { // year
+    for (let m = 0; m < 12; m++) {
+      let monthTotal = {};
+      const dim = getDIM(today.getFullYear(), m);
+      for (let d = 1; d <= dim; d++) {
+        const key = toKey(today.getFullYear(), m, d);
+        const dayData = timerLog[key] || {};
+        Object.entries(dayData).forEach(([catId, secs]) => {
+          monthTotal[catId] = (monthTotal[catId] || 0) + secs;
+        });
+      }
+      const monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+      items.push({ label: monthNames[m], key: `${today.getFullYear()}-${m}`, data: monthTotal });
+    }
+  }
+  
+  return items.map(item => ({
+    label: item.label,
+    total: Object.values(item.data).reduce((a,b)=>a+b,0),
+    segments: timerCats.map(cat => ({
+      catId: cat.id,
+      color: cat.color,
+      value: item.data[cat.id] || 0,
+    })).filter(s => s.value > 0),
+  }));
+}
+
+/* ── STATUS ICON ── */
+function StatusIcon({ status, sel }) {
+  if (!status) return null;
+  const map = { circle:["○",sel?"rgba(255,255,255,0.9)":"#2EB87A"], tri:["△",sel?"rgba(255,255,255,0.9)":"#D48C10"], cross:["✕",sel?"rgba(255,255,255,0.9)":"#D85050"] };
+  const [ch,col] = map[status];
+  return <span style={{color:col,fontSize:".65rem",fontWeight:800,lineHeight:1}}>{ch}</span>;
+}
+
+/* ── BURST ── */
+function BurstEffect({ color }) {
+  const angles = [0,45,90,135,180,225,270,315];
+  const palette = [color,"#FFD97D","#7EB8F7","#FF8FAB","#5DC98A",color,"#FFD97D","#7EB8F7"];
+  return (
+    <div style={{position:"absolute",left:11,top:11,width:0,height:0,pointerEvents:"none",zIndex:50}}>
+      {angles.map((a,i) => (
+        <span key={a} style={{position:"absolute",display:"block",width:6,height:6,borderRadius:"50%",background:palette[i%palette.length],marginLeft:-3,marginTop:-3,animation:"kc-burst 0.58s ease-out forwards","--a":`${a}deg`}}/>
+      ))}
+    </div>
+  );
+}
+
+/* ════════════ WEATHER WIDGET ════════════ */
+function WeatherWidget() {
+  const [state,setState] = useState("loading");
+  const [curr,setCurr]   = useState(null);
+  const [forecast,setForecast] = useState([]);
+  const [locName,setLocName]   = useState("");
+
+  const fetch_ = useCallback(async () => {
+    setState("loading");
+    try {
+      const pos = await new Promise((res,rej) => navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000}));
+      const {latitude:lat,longitude:lon} = pos.coords;
+      try {
+        const geo = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ja`).then(r=>r.json());
+        setLocName(geo.address?.city || geo.address?.town || geo.address?.county || "");
+      } catch {}
+      await loadWeather(lat, lon);
+    } catch {
+      await loadWeather(35.6895, 139.6917);
+      setLocName("東京（推定）");
+    }
+  }, []);
+
+  async function loadWeather(lat, lon) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&forecast_days=4`;
+    const j = await fetch(url).then(r=>r.json());
+    const c = j.current;
+    setCurr({temp:Math.round(c.temperature_2m),feels:Math.round(c.apparent_temperature),humidity:c.relative_humidity_2m,...weatherInfo(c.weather_code)});
+    const dNames = ["明日","明後日","3日後"];
+    const fc = j.daily.time.slice(1,4).map((t,i) => ({
+      label: dNames[i],
+      ...weatherInfo(j.daily.weather_code[i+1]),
+      max: Math.round(j.daily.temperature_2m_max[i+1]),
+      min: Math.round(j.daily.temperature_2m_min[i+1]),
+    }));
+    setForecast(fc);
+    setState("ok");
+  }
+
+  useEffect(()=>{fetch_();},[]);
+
+  return (
+    <div className="weather-card">
+      <div className="weather-card-label">🌡 今日の天気</div>
+      {state==="loading" && <div className="weather-loading"><span style={{fontSize:"2rem",animation:"shimmer 1.5s infinite"}}>🔍</span><span>取得中...</span></div>}
+      {state==="error"   && <div className="weather-error"><span style={{fontSize:"2rem"}}>😞</span><span>取得できませんでした</span><button className="weather-retry" onClick={fetch_}>再試行</button></div>}
+      {state==="ok" && curr && <>
+        <div className="weather-current">
+          <span className="weather-icon">{curr.emoji}</span>
+          <div>
+            <div className="weather-temp">{curr.temp}<span>℃</span></div>
+            <div className="weather-desc">{curr.label}</div>
+          </div>
+          <div style={{marginLeft:"auto",display:"flex",flexDirection:"column",gap:4}}>
+            <div className="weather-chip">💧 {curr.humidity}%</div>
+            <div className="weather-chip">🌡 体感 {curr.feels}℃</div>
+          </div>
+        </div>
+        {forecast.length > 0 && (
+          <div className="forecast-row">
+            {forecast.map((f,i) => (
+              <div className="fc-card" key={i}>
+                <div className="fc-day">{f.label}</div>
+                <div className="fc-icon">{f.emoji}</div>
+                <div className="fc-temp">{f.max}° / {f.min}°</div>
+              </div>
+            ))}
+          </div>
+        )}
+        {locName && <div className="weather-location">📍 {locName}</div>}
+      </>}
+    </div>
+  );
+}
+
+/* ════════════ TIMER SECTION ════════════ */
+const WORK_TIME = 25*60, BREAK_TIME = 5*60;
+
+function TimerSection() {
+  const [tab,setTab]           = useState("pomodoro");
+  const [pomSecs,setPomSecs]   = useState(WORK_TIME);
+  const [pomRun,setPomRun]     = useState(false);
+  const [pomMode,setPomMode]   = useState("work");
+  const [pomCycles,setPomCycles]=useState(0);
+  const [swSecs,setSwSecs]     = useState(0);
+  const [swRun,setSwRun]       = useState(false);
+  const pomModeRef             = useRef("work");
+
+  // Timer categories
+  const [timerCats,setTimerCats] = useState(()=>{ try{return JSON.parse(localStorage.getItem("kc-timer-cats")||"[]");}catch{return[];} });
+  const [activeCat,setActiveCat] = useState(null);
+  const [showTCForm,setShowTCForm] = useState(false);
+  const [tcName,setTcName]     = useState("");
+  const [tcColor,setTcColor]   = useState(COLOR_PRESETS[0]);
+
+  // Timer log
+  const [timerLog,setTimerLog] = useState(()=>{ try{return JSON.parse(localStorage.getItem("kc-timer-log")||"{}");}catch{return{};} });
+
+  // Persist
+  useEffect(()=>{ try{localStorage.setItem("kc-timer-cats",JSON.stringify(timerCats));}catch{}; },[timerCats]);
+  useEffect(()=>{ try{localStorage.setItem("kc-timer-log",JSON.stringify(timerLog));}catch{}; },[timerLog]);
+
+  const todayTotal = useMemo(()=>Object.values(timerLog[todayStr()]||{}).reduce((a,b)=>a+b,0),[timerLog]);
+
+  const recordTick = useCallback((isWork) => {
+    if (!isWork) return;
+    setTimerLog(prev => {
+      const today = todayStr();
+      const catId = activeCat || "_none";
+      const day = prev[today] || {};
+      return {...prev, [today]: {...day, [catId]: (day[catId]||0)+1}};
+    });
+  }, [activeCat]);
+
+  // Pomodoro tick
+  useEffect(()=>{
+    if(!pomRun) return;
+    const id = setInterval(()=>{
+      const isWork = pomModeRef.current === "work";
+      recordTick(isWork);
+      setPomSecs(prev => {
+        if (prev <= 1) {
+          if (pomModeRef.current === "work") {
+            pomModeRef.current = "break"; setPomMode("break"); setPomCycles(c=>c+1); return BREAK_TIME;
+          } else {
+            pomModeRef.current = "work"; setPomMode("work"); return WORK_TIME;
+          }
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [pomRun, recordTick]);
+
+  // Stopwatch tick
+  useEffect(()=>{
+    if(!swRun) return;
+    const id = setInterval(()=>{ recordTick(true); setSwSecs(s=>s+1); }, 1000);
+    return () => clearInterval(id);
+  }, [swRun, recordTick]);
+
+  const resetPom = () => { setPomRun(false); pomModeRef.current="work"; setPomMode("work"); setPomSecs(WORK_TIME); };
+  const resetSw  = () => { setSwRun(false); setSwSecs(0); };
+
+  const addTimerCat = () => {
+    if (!tcName.trim()) return;
+    const id = "tc_" + Date.now();
+    setTimerCats(p => [...p, {id, label:tcName.trim(), color:tcColor.color, bg:tcColor.bg}]);
+    setActiveCat(id);
+    setTcName(""); setTcColor(COLOR_PRESETS[0]); setShowTCForm(false);
+  };
+  const deleteTimerCat = (id) => {
+    setTimerCats(p => p.filter(c=>c.id!==id));
+    if (activeCat === id) setActiveCat(null);
+  };
+
+  const progress = ((WORK_TIME - pomSecs) / WORK_TIME) * 100;
+
+  return (
+    <div className="timer-section">
+      <div className="timer-tabs">
+        <button className={`timer-tab${tab==="pomodoro"?" on":""}`} onClick={()=>setTab("pomodoro")}>🍅 ポモドーロ</button>
+        <button className={`timer-tab${tab==="stopwatch"?" on":""}`} onClick={()=>setTab("stopwatch")}>⏱ ストップウォッチ</button>
+      </div>
+
+      {tab==="pomodoro" && <>
+        <div className={`pom-badge${pomMode==="work"?" work":" brk"}`}>{pomMode==="work"?"🍅 作業中":"☕ 休憩中"}</div>
+        <div className="timer-display">{fmtMS(pomSecs)}</div>
+        <div className="pom-bar-wrap"><div className="pom-bar-fill" style={{width:`${progress}%`}}/></div>
+        <div className="timer-controls">
+          <button className="tc-btn tc-primary" onClick={()=>setPomRun(r=>!r)}>{pomRun?"⏸ 停止":"▶ スタート"}</button>
+          <button className="tc-btn tc-secondary" onClick={resetPom}>↺</button>
+        </div>
+        {pomCycles>0 && <div className="pom-cycles">🍅 × {pomCycles} セッション完了</div>}
+      </>}
+
+      {tab==="stopwatch" && <>
+        <div className="timer-display">{fmtHMS(swSecs)}</div>
+        <div className="timer-controls">
+          <button className="tc-btn tc-primary" onClick={()=>setSwRun(r=>!r)}>{swRun?"⏸ 停止":"▶ スタート"}</button>
+          <button className="tc-btn tc-secondary" onClick={resetSw}>↺</button>
+        </div>
+      </>}
+
+      {/* Timer categories */}
+      <div className="tc-section">
+        <div className="tc-section-label">⏺ 記録カテゴリー</div>
+        <div className="tc-pills">
+          {timerCats.map(cat => (
+            <div key={cat.id} className="tc-pill-wrap">
+              <button className="tc-pill"
+                style={{color:cat.color, background:activeCat===cat.id?cat.bg:"transparent", borderColor:activeCat===cat.id?cat.color:"#E8E0F0"}}
+                onClick={()=>setActiveCat(a=>a===cat.id?null:cat.id)}
+              >
+                <span className="tc-dot" style={{background:cat.color}}/>{cat.label}
+              </button>
+              <button className="tc-pill-del" onClick={()=>deleteTimerCat(cat.id)}>×</button>
+            </div>
+          ))}
+          <button className="tc-add-btn" onClick={()=>setShowTCForm(v=>!v)}>＋</button>
+        </div>
+        {showTCForm && (
+          <div className="tc-form">
+            <input placeholder="カテゴリー名" value={tcName} onChange={e=>setTcName(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")addTimerCat();}}/>
+            <div className="swatches">
+              {COLOR_PRESETS.map((p,i)=>(
+                <div key={i} className={`swatch${tcColor===p?" picked":""}`} style={{background:p.color}} onClick={()=>setTcColor(p)}/>
+              ))}
+            </div>
+            <div className="tc-form-actions">
+              <button className="nc-save" onClick={addTimerCat}>追加</button>
+              <button className="nc-cancel" onClick={()=>{setShowTCForm(false);setTcName("");}}>キャンセル</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="timer-total">今日の合計：{fmtHMS(todayTotal)}</div>
+    </div>
+  );
+}
+
+/* ════════════ STACKED BAR CHART ════════════ */
+function StackedBarChart({ data }) {
+  const maxVal = Math.max(...data.map(d => d.total), 1);
+  const W = 560, H = 160;
+  const PL = 38, PR = 8, PT = 8, PB = 24;
+  const cW = W-PL-PR, cH = H-PT-PB;
+  const bW = Math.max(cW/data.length * 0.72, 4);
+  const gap = cW / data.length;
+
+  const yLabels = [0, 0.5, 1];
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:H}}>
+      {/* Grid lines + Y labels */}
+      {yLabels.map(frac => {
+        const y = PT + cH*(1-frac);
+        const hrs = (maxVal/3600*frac).toFixed(1);
+        return (
+          <g key={frac}>
+            <line x1={PL} y1={y} x2={W-PR} y2={y} stroke="#F0E8F8" strokeWidth="1"/>
+            <text x={PL-4} y={y+4} textAnchor="end" fontSize="9" fill="#C0B0D0">{hrs}h</text>
+          </g>
+        );
+      })}
+      {/* Bars */}
+      {data.map((item,i) => {
+        const bX = PL + gap*i + (gap-bW)/2;
+        if (item.total === 0) {
+          return (
+            <g key={i}>
+              <text x={bX+bW/2} y={H-4} textAnchor="middle" fontSize={data.length>15?"7":"8"} fill="#C0B0D0">{item.label}</text>
+            </g>
+          );
+        }
+        let yOff = PT+cH;
+        return (
+          <g key={i}>
+            {item.segments.map((seg,si) => {
+              const h = Math.max((seg.value/maxVal)*cH, 1);
+              yOff -= h;
+              const isTop = si===item.segments.length-1;
+              return <rect key={seg.catId} x={bX} y={yOff} width={bW} height={h} fill={seg.color} rx={isTop?2:0}/>;
+            })}
+            <text x={bX+bW/2} y={H-4} textAnchor="middle" fontSize={data.length>15?"7":"8"} fill="#9B8FAA">{item.label}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ════════════ STATS SCREEN ════════════ */
+function StatsScreen() {
+  const [period, setPeriod] = useState("week");
+  const [timerLog]    = useState(()=>{ try{return JSON.parse(localStorage.getItem("kc-timer-log")||"{}");}catch{return{};} });
+  const [timerCats]   = useState(()=>{ try{return JSON.parse(localStorage.getItem("kc-timer-cats")||"[]");}catch{return[];} });
+
+  const chartData = useMemo(()=>buildChartData(timerLog,timerCats,period),[timerLog,timerCats,period]);
+  const hasData   = chartData.some(d=>d.total>0);
+  const streak    = useMemo(()=>calcStreak(timerLog),[timerLog]);
+  const weekTotal = useMemo(()=>getWeekTotal(timerLog),[timerLog]);
+  const monthTotal= useMemo(()=>getMonthTotal(timerLog),[timerLog]);
+  const yearTotal = useMemo(()=>getYearTotal(timerLog),[timerLog]);
+  const allTotal  = useMemo(()=>getAllTotal(timerLog),[timerLog]);
+
+  const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  const quote = QUOTES[doy % QUOTES.length];
+
+  // Achievements
+  const achievements = [
+    {icon:"🌱",name:"はじめの一歩",desc:"タイマーを初めて使用",unlocked:allTotal>0},
+    {icon:"⏰",name:"集中1時間",desc:"合計1時間達成",unlocked:allTotal>=3600},
+    {icon:"🔥",name:"3日連続",desc:"3日連続で記録",unlocked:streak>=3},
+    {icon:"📚",name:"10時間突破",desc:"合計10時間達成",unlocked:allTotal>=36000},
+    {icon:"💪",name:"7日連続",desc:"1週間継続",unlocked:streak>=7},
+    {icon:"🌟",name:"100時間の旅人",desc:"合計100時間達成",unlocked:allTotal>=360000},
+  ];
+
+  const usedCats = timerCats.filter(cat => chartData.some(d=>d.segments.some(s=>s.catId===cat.id)));
+
+  return (
+    <div className="stats-wrap dot-bg">
+      <div className="stats-title">📊 統計</div>
+      <div className="stats-period-tabs">
+        {["week","month","year"].map(p=>(
+          <button key={p} className={`sp-tab${period===p?" on":""}`} onClick={()=>setPeriod(p)}>
+            {p==="week"?"今週":p==="month"?"今月":"今年"}
+          </button>
+        ))}
+      </div>
+
+      <div className="stats-body">
+        {/* Chart */}
+        <div className="chart-card">
+          <div className="chart-title">カテゴリー別 作業時間</div>
+          {hasData ? (
+            <>
+              <StackedBarChart data={chartData}/>
+              {usedCats.length > 0 && (
+                <div className="chart-legend">
+                  {usedCats.map(cat=>(
+                    <div key={cat.id} className="legend-item">
+                      <span className="legend-dot" style={{background:cat.color}}/>
+                      {cat.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="chart-empty">
+              <span style={{fontSize:"2.5rem"}}>🍅</span>
+              <span>まだデータがないよ！タイマーでカテゴリーを記録しよう</span>
+            </div>
+          )}
+        </div>
+
+        {/* Right panel */}
+        <div className="stats-right">
+          {/* Summary */}
+          <div className="stats-summary">
+            <div className="stats-summary-title">⏱ 合計作業時間</div>
+            {[
+              {label:"今週",value:fmtHM(weekTotal)},
+              {label:"今月",value:fmtHM(monthTotal)},
+              {label:"今年",value:fmtHM(yearTotal)},
+              {label:"累計",value:fmtHM(allTotal)},
+            ].map(({label,value})=>(
+              <div className="sum-row" key={label}>
+                <span className="sum-label">{label}</span>
+                <span className="sum-value">{value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Streak */}
+          <div className="streak-card">
+            <div className="streak-num">{streak}🔥</div>
+            <div className="streak-label">日連続で記録中</div>
+          </div>
+
+          {/* Daily quote */}
+          <div className="quote-card">
+            <div className="quote-text">「{quote.text}」</div>
+            <div className="quote-author">— {quote.author}</div>
+          </div>
+
+          {/* Achievements */}
+          <div className="achievements">
+            <div className="ach-title">🏆 実績</div>
+            <div className="ach-grid">
+              {achievements.map((ach,i)=>(
+                <div key={i} className={`ach-item${ach.unlocked?" unlocked":" locked"}`}>
+                  <span className="ach-icon">{ach.unlocked?ach.icon:"🔒"}</span>
+                  <div>
+                    <div className="ach-name">{ach.name}</div>
+                    <div className="ach-desc">{ach.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ HOME SCREEN ════════════ */
+function HomeScreen({ goToCalendar }) {
+  const today = new Date();
+  const y=today.getFullYear(), m=today.getMonth()+1, d=today.getDate();
+  const key = toKey(y,m-1,d);
+  const holiday = JP_HOLIDAYS[key] || null;
+  const [todos] = useState(()=>{ try{return JSON.parse(localStorage.getItem("kc-todos")||"{}");}catch{return{};} });
+  const todayTodos = todos[key] || [];
+  const remaining  = todayTodos.filter(t=>!t.done).length;
+  return (
+    <div className="home-wrap dot-bg">
+      <div className="home-date-section">
+        <div className="greeting">{getGreeting()}</div>
+        <div className="year-label">{y}年</div>
+        <div className="big-date">{m}月{d}日</div>
+        {holiday && <div className="holiday-badge">🎌 {holiday}</div>}
+      </div>
+      <div className="home-bottom">
+        <WeatherWidget/>
+        <div className="home-right">
+          <button className="action-btn" onClick={goToCalendar}>
+            <span style={{fontSize:"1.5rem"}}>📋</span>
+            <div style={{flex:1}}>
+              <div>今日のTodoを確認</div>
+              <div className="action-btn-sub">{remaining>0?`残り ${remaining} 件`:todayTodos.length>0?"全部完了！🎉":"タスクなし"}</div>
+            </div>
+            <span style={{opacity:.6,fontSize:"1rem"}}>›</span>
+          </button>
+          <div className="action-space">ここにボタンを追加予定</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ CALENDAR SCREEN ════════════ */
+function CalendarScreen() {
+  const today = new Date();
+  const [year,setYear]   = useState(today.getFullYear());
+  const [month,setMonth] = useState(today.getMonth());
+  const [selDay,setSelDay]=useState(today.getDate());
+  const [todos,setTodos] = useState({});
+  const [input,setInput] = useState("");
+  const [selCat,setSelCat]=useState("other");
+  const [bursting,setBursting]=useState(new Set());
+  const [composing,setComposing]=useState(false);
+  const [loaded,setLoaded]=useState(false);
+  const [customTodoCats,setCustomTodoCats]=useState(()=>{ try{return JSON.parse(localStorage.getItem("kc-custom-cats")||"[]");}catch{return[];} });
+  const [showCatForm,setShowCatForm]=useState(false);
+  const [newCatName,setNewCatName]=useState("");
+  const [newCatColor,setNewCatColor]=useState(COLOR_PRESETS[0]);
+
+  const allCats = [...DEFAULT_TODO_CATS, ...customTodoCats];
+
+  useEffect(()=>{ try{const s=localStorage.getItem("kc-todos");if(s)setTodos(JSON.parse(s));}catch{} setLoaded(true); },[]);
+  useEffect(()=>{ if(!loaded)return; try{localStorage.setItem("kc-todos",JSON.stringify(todos));}catch{}; },[todos,loaded]);
+  useEffect(()=>{ try{localStorage.setItem("kc-custom-cats",JSON.stringify(customTodoCats));}catch{}; },[customTodoCats]);
+
+  const selKey   = toKey(year,month,selDay);
+  const dayTodos = todos[selKey]||[];
+  const sorted   = [...dayTodos].sort((a,b)=>{
+    const ia=allCats.findIndex(c=>c.id===(a.cat||"other"));
+    const ib=allCats.findIndex(c=>c.id===(b.cat||"other"));
+    return ia!==ib?ia-ib:(a.done?1:0)-(b.done?1:0);
+  });
+  const groups = allCats.map(cat=>({cat,items:sorted.filter(t=>(t.cat||"other")===cat.id)})).filter(g=>g.items.length>0);
+
+  const addTodo=()=>{
+    if(!input.trim())return;
+    setTodos(p=>({...p,[selKey]:[...(p[selKey]||[]),{id:Date.now(),text:input.trim(),cat:selCat,done:false}]}));
+    setInput("");
+  };
+  const toggleTodo=(id)=>{
+    const t=(todos[selKey]||[]).find(t=>t.id===id);
+    if(!t)return;
+    if(!t.done){ setBursting(p=>new Set([...p,id])); setTimeout(()=>setBursting(p=>{const n=new Set(p);n.delete(id);return n;}),620); }
+    setTodos(p=>({...p,[selKey]:(p[selKey]||[]).map(t=>t.id===id?{...t,done:!t.done}:t)}));
+  };
+  const deleteTodo=(id)=>setTodos(p=>({...p,[selKey]:(p[selKey]||[]).filter(t=>t.id!==id)}));
+  const prevMonth=()=>{ if(month===0){setYear(y=>y-1);setMonth(11);}else setMonth(m=>m-1);setSelDay(1); };
+  const nextMonth=()=>{ if(month===11){setYear(y=>y+1);setMonth(0);}else setMonth(m=>m+1);setSelDay(1); };
+  const addCustomCat=()=>{
+    if(!newCatName.trim())return;
+    const id="cat_"+Date.now();
+    setCustomTodoCats(p=>[...p,{id,label:newCatName.trim(),color:newCatColor.color,bg:newCatColor.bg}]);
+    setSelCat(id);setNewCatName("");setNewCatColor(COLOR_PRESETS[0]);setShowCatForm(false);
+  };
+  const deleteCustomCat=(id)=>{ setCustomTodoCats(p=>p.filter(c=>c.id!==id)); if(selCat===id)setSelCat("other"); };
+
+  const daysInMonth=getDIM(year,month), firstDay=getFD(year,month);
+  const cells=[...Array(firstDay).fill(null),...Array.from({length:daysInMonth},(_,i)=>i+1)];
+  const isToday=d=>d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear();
+  const doneCnt=dayTodos.filter(t=>t.done).length;
+
+  return (
+    <div className="layout">
+      <div className="left-panel">
+        {/* Calendar */}
+        <div className="cal-section">
+          <div className="cal-nav">
+            <button className="cal-arr" onClick={prevMonth}>‹</button>
+            <span className="cal-lbl">{year}年{month+1}月</span>
+            <button className="cal-arr" onClick={nextMonth}>›</button>
+          </div>
+          <div className="cal-grid">
+            {DAYS_SHORT.map(d=><div className="cal-dh" key={d}>{d}</div>)}
+            {cells.map((d,i)=>{
+              if(!d) return <div className="cal-cell empty" key={`e${i}`}/>;
+              const key=toKey(year,month,d);
+              const status=getDayStatus(todos[key],key);
+              const isSel=d===selDay, isTod=isToday(d);
+              return (
+                <div key={d} className={`cal-cell${isTod&&!isSel?" today-c":""}${isSel?" sel":""}`} onClick={()=>setSelDay(d)}>
+                  <span>{d}</span>
+                  <div style={{height:12,display:"flex",alignItems:"center"}}>
+                    <StatusIcon status={status} sel={isSel}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        {/* Timer */}
+        <TimerSection/>
+      </div>
+
+      {/* TODO */}
+      <div className="todo-panel">
+        <div className="todo-hdr">
+          <div className="todo-date">{year}年{month+1}月{selDay}日</div>
+          <div className="todo-stat">{dayTodos.length===0?"タスクなし":`${doneCnt} / ${dayTodos.length} 完了`}</div>
+        </div>
+        <div className="todo-scroll">
+          {groups.length===0
+            ? <div className="empty-st"><span style={{fontSize:"2.4rem"}}>🐔</span><span>この日のタスクはまだないよ！</span></div>
+            : groups.map(({cat,items})=>(
+              <div className="cat-sec" key={cat.id}>
+                <div className="cat-hdr" style={{background:cat.bg,color:cat.color}}>
+                  <span className="cat-dot-sm" style={{background:cat.color}}/>{cat.label}
+                </div>
+                {items.map(t=>(
+                  <div key={t.id} className={`t-item${t.done?" done-i":""}`}>
+                    <button className={`chk${t.done?" on":""}`} onClick={()=>toggleTodo(t.id)}>
+                      <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                    {bursting.has(t.id) && <BurstEffect color={cat.color}/>}
+                    <div className="cat-dot" style={{background:cat.color,opacity:t.done?.35:1}}/>
+                    <span className={`t-txt${t.done?" done":""}`}>{t.text}</span>
+                    <button className="del" onClick={()=>deleteTodo(t.id)}>✕</button>
+                  </div>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+        <div className="add-area">
+          <div className="add-row">
+            <input className="add-inp" placeholder="タスクを追加..."
+              value={input} onChange={e=>setInput(e.target.value)}
+              onCompositionStart={()=>setComposing(true)}
+              onCompositionEnd={()=>setComposing(false)}
+              onKeyDown={e=>{if(e.key==="Enter"&&!composing)addTodo();}}
+            />
+            <button className="add-btn" onClick={addTodo}>追加</button>
+          </div>
+          <div className="cat-row">
+            {allCats.map(cat=>{
+              const isCustom=customTodoCats.some(c=>c.id===cat.id);
+              return (
+                <div key={cat.id} className="c-pill-wrap">
+                  <button className="c-pill"
+                    style={{color:cat.color,background:selCat===cat.id?cat.bg:"transparent",borderColor:selCat===cat.id?cat.color:"transparent"}}
+                    onClick={()=>setSelCat(cat.id)}
+                  >{cat.label}</button>
+                  {isCustom && <button className="c-pill-del" onClick={()=>deleteCustomCat(cat.id)}>×</button>}
+                </div>
+              );
+            })}
+            <button className="add-cat-btn" onClick={()=>setShowCatForm(v=>!v)}>＋ カテゴリー</button>
+          </div>
+          {showCatForm && (
+            <div className="new-cat-form">
+              <input placeholder="カテゴリー名" value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")addCustomCat();}}/>
+              <div className="color-swatches">
+                {COLOR_PRESETS.map((p,i)=>(
+                  <div key={i} className={`color-swatch${newCatColor===p?" picked":""}`} style={{background:p.color}} onClick={()=>setNewCatColor(p)}/>
+                ))}
+              </div>
+              <div className="new-cat-actions">
+                <button className="nc-save" onClick={addCustomCat}>追加</button>
+                <button className="nc-cancel" onClick={()=>{setShowCatForm(false);setNewCatName("");}}>キャンセル</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ APP ════════════ */
+function App() {
+  const [view,setView]     = useState("home");
+  const [menuOpen,setMenuOpen]=useState(false);
+  const closeTimer         = useRef(null);
+  const openMenu  = ()=>{ clearTimeout(closeTimer.current); setMenuOpen(true); };
+  const closeMenu = ()=>{ closeTimer.current=setTimeout(()=>setMenuOpen(false),180); };
+  const navigate  = v=>{ setView(v); setMenuOpen(false); };
+
+  return (<>
+    <header className="hdr">
+      <button className="burger" onMouseEnter={openMenu} onMouseLeave={closeMenu} aria-label="メニュー"><span/><span/><span/></button>
+      <span className="logo" onClick={()=>navigate("home")}>Karaagechan</span>
+    </header>
+    <div className={`drawer${menuOpen?" open":""}`} onMouseEnter={openMenu} onMouseLeave={closeMenu}>
+      <div className="d-logo">🍗 Karaagechan</div>
+      <button className={`d-item${view==="home"?" active":""}`}     onClick={()=>navigate("home")}>🏠 ホーム</button>
+      <button className={`d-item${view==="calendar"?" active":""}`} onClick={()=>navigate("calendar")}>📅 カレンダー</button>
+      <button className={`d-item${view==="stats"?" active":""}`}    onClick={()=>navigate("stats")}>📊 統計</button>
+      <button className="d-item dim" disabled>⚙️ 設定 <small style={{fontSize:".64rem",marginLeft:2}}>(準備中)</small></button>
+    </div>
+    {view==="home"     && <HomeScreen goToCalendar={()=>navigate("calendar")}/>}
+    {view==="calendar" && <CalendarScreen/>}
+    {view==="stats"    && <StatsScreen key={Date.now()}/>}
+  </>);
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
