@@ -32,6 +32,16 @@ body{font-family:'Nunito',sans-serif;color:#4A3F55;background:#FDF6FF;min-height
 .toast-desc{font-size:.68rem;font-weight:600;color:#9B8FAA;margin-top:1px;}
 /* HEADER */
 .hdr{position:sticky;top:0;z-index:100;background:rgba(253,246,255,.94);backdrop-filter:blur(10px);border-bottom:1.5px solid #EAE0F5;height:54px;display:flex;align-items:center;gap:14px;padding:0 20px;}
+.hdr-spacer{flex:1;}
+.auth-btn{background:#EDE0F8;border:none;border-radius:20px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;color:#7A50A0;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.auth-btn:hover{background:#DDD0F0;}
+.auth-user{display:flex;align-items:center;gap:7px;background:#F5EFFE;border-radius:20px;padding:4px 10px 4px 4px;cursor:pointer;transition:background .15s;border:none;font-family:'Nunito',sans-serif;}
+.auth-user:hover{background:#EDE0F8;}
+.auth-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;}
+.auth-name{font-size:.74rem;font-weight:700;color:#7A50A0;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#C9A8E0;flex-shrink:0;}
+.sync-dot.syncing{animation:syncing .8s ease infinite;}
+@keyframes syncing{0%,100%{opacity:.3;}50%{opacity:1;}}
 .burger{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:7px;border-radius:8px;transition:background .15s;}
 .burger:hover{background:#F5EFFE;}
 .burger span{display:block;width:20px;height:2px;background:#C9A8E0;border-radius:2px;}
@@ -55,26 +65,26 @@ body{font-family:'Nunito',sans-serif;color:#4A3F55;background:#FDF6FF;min-height
 /* WEATHER CARD - full width */
 .weather-card{background:linear-gradient(135deg,#C0E8FF 0%,#B0D8FF 45%,#C8B8F8 100%);border-radius:22px;padding:20px 24px;border:1.5px solid rgba(255,255,255,.6);box-shadow:0 4px 20px rgba(150,190,255,.25);margin-bottom:16px;}
 .weather-top-label{font-size:.68rem;font-weight:700;color:rgba(40,70,140,.6);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
-.weather-inner{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
-.weather-current{display:flex;align-items:center;gap:12px;min-width:150px;}
-.w-icon{font-size:2.6rem;line-height:1;}
-.w-temp{font-size:2.4rem;font-weight:900;color:#1A3060;line-height:1;letter-spacing:-.02em;}
-.w-temp-unit{font-size:1rem;font-weight:700;}
-.w-desc{font-size:.88rem;font-weight:700;color:#2A4080;}
-.w-chips{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
-.w-chip{background:rgba(255,255,255,.45);border-radius:8px;padding:3px 8px;font-size:.7rem;font-weight:700;color:#2A4080;display:inline-block;}
-.weather-divider{width:1px;background:rgba(255,255,255,.4);align-self:stretch;min-height:70px;}
-.weather-section{display:flex;flex-direction:column;gap:6px;flex:1;min-width:120px;}
-.ws-label{font-size:.64rem;font-weight:700;color:rgba(40,70,140,.55);letter-spacing:.05em;margin-bottom:2px;}
-.hourly-row{display:flex;gap:5px;flex-wrap:wrap;}
-.fc-sm{background:rgba(255,255,255,.35);border-radius:10px;padding:6px 7px;text-align:center;min-width:44px;}
-.fc-sm-lbl{font-size:.6rem;font-weight:700;color:rgba(40,70,140,.65);display:block;}
-.fc-sm-icon{font-size:1rem;line-height:1.3;display:block;}
-.fc-sm-temp{font-size:.68rem;font-weight:700;color:#1A3060;display:block;}
-.daily-col{display:flex;flex-direction:column;gap:5px;}
-.fc-day-row{background:rgba(255,255,255,.35);border-radius:10px;padding:5px 10px;display:flex;align-items:center;gap:8px;}
-.fc-day-lbl{font-size:.62rem;font-weight:700;color:rgba(40,70,140,.65);width:34px;flex-shrink:0;}
-.fc-day-temp{font-size:.7rem;font-weight:700;color:#1A3060;margin-left:auto;}
+.weather-inner{display:grid;grid-template-columns:auto 1px auto 1px auto;gap:18px;align-items:center;}
+.weather-current{display:flex;align-items:center;gap:14px;}
+.w-icon{font-size:3.2rem;line-height:1;}
+.w-temp{font-size:3rem;font-weight:900;color:#1A3060;line-height:1;letter-spacing:-.02em;}
+.w-temp-unit{font-size:1.2rem;font-weight:700;}
+.w-desc{font-size:1rem;font-weight:700;color:#2A4080;margin-top:2px;}
+.w-chips{display:flex;flex-direction:column;gap:5px;margin-top:6px;}
+.w-chip{background:rgba(255,255,255,.45);border-radius:8px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#2A4080;display:inline-block;}
+.weather-divider{width:1px;background:rgba(255,255,255,.4);align-self:stretch;min-height:80px;}
+.weather-section{display:flex;flex-direction:column;gap:8px;}
+.ws-label{font-size:.72rem;font-weight:700;color:rgba(40,70,140,.55);letter-spacing:.05em;margin-bottom:2px;}
+.hourly-row{display:flex;gap:6px;}
+.fc-sm{background:rgba(255,255,255,.35);border-radius:10px;padding:8px 10px;text-align:center;min-width:52px;}
+.fc-sm-lbl{font-size:.68rem;font-weight:700;color:rgba(40,70,140,.65);display:block;}
+.fc-sm-icon{font-size:1.2rem;line-height:1.4;display:block;}
+.fc-sm-temp{font-size:.76rem;font-weight:700;color:#1A3060;display:block;}
+.daily-col{display:flex;flex-direction:column;gap:6px;}
+.fc-day-row{background:rgba(255,255,255,.35);border-radius:10px;padding:7px 12px;display:flex;align-items:center;gap:10px;}
+.fc-day-lbl{font-size:.72rem;font-weight:700;color:rgba(40,70,140,.65);width:38px;flex-shrink:0;}
+.fc-day-temp{font-size:.78rem;font-weight:700;color:#1A3060;margin-left:auto;}
 .w-location{font-size:.65rem;font-weight:600;color:rgba(40,70,140,.5);margin-top:8px;}
 .w-loading,.w-error{display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(40,70,140,.55);font-size:.84rem;font-weight:600;padding:16px 0;}
 .w-retry{background:rgba(255,255,255,.45);border:none;border-radius:8px;padding:5px 12px;font-size:.74rem;font-weight:700;color:#2A4080;cursor:pointer;font-family:'Nunito',sans-serif;}
@@ -206,7 +216,7 @@ input[type=color]::-webkit-color-swatch{border:2px solid #EAE0F5;border-radius:5
   .layout{flex-direction:column;}
   .left-panel{width:100%;max-width:100%;border-right:none;border-bottom:1.5px solid #EAE0F5;}
   .home-wrap{padding:0 14px 24px;}
-  .weather-inner{flex-direction:column;}.weather-divider{display:none;}
+  .weather-inner{grid-template-columns:1fr;}.weather-divider{display:none;}
   .stats-body{grid-template-columns:1fr;}
 }
 /* ACHIEVEMENTS */
@@ -231,17 +241,79 @@ input[type=color]::-webkit-color-swatch{border:2px solid #EAE0F5;border-radius:5
 </head>
 <body>
 <div id="root"><div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:'Nunito',sans-serif;color:#C9A8E0;font-size:1.3rem;font-weight:800;">🍗 読み込み中...</div></div>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script>
 // ── e = React.createElement の省略形 ──────────────────────────
+// ── FIREBASE INIT ────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyCLEEv0O0lW3d2gc9J65JytKI7DFg_T20M",
+  authDomain: "karaagechan-a9b9d.firebaseapp.com",
+  projectId: "karaagechan-a9b9d",
+  storageBucket: "karaagechan-a9b9d.firebasestorage.app",
+  messagingSenderId: "159818747275",
+  appId: "1:159818747275:web:95cb61a6d3fa863dcbf38e"
+};
+firebase.initializeApp(firebaseConfig);
+const _auth = firebase.auth();
+const _db   = firebase.firestore();
+const _provider = new firebase.auth.GoogleAuthProvider();
+
+// 同期対象キー
+const SYNC_KEYS = ['kc-todos','kc-custom-cats','kc-timer-log','kc-timer-cats','kc-pom-cycles','kc-unlocked'];
+let _currentUser = null;
+let _syncTimer = null;
+let _onAuthChangeCb = null; // Appから登録するコールバック
+
+// Firestoreから全データをlocalStorageに書き込む
+async function loadFromFirestore(uid) {
+  try {
+    const doc = await _db.collection('users').doc(uid).get();
+    if (doc.exists) {
+      const d = doc.data();
+      SYNC_KEYS.forEach(k => { if (d[k] !== undefined) localStorage.setItem(k, JSON.stringify(d[k])); });
+    } else {
+      // 初回ログイン → 既存のlocalStorageデータをアップロード
+      await pushToFirestore(uid);
+    }
+  } catch(err) { console.error('Firestore load error:', err); }
+}
+
+// localStorageの全データをFirestoreにアップロード
+async function pushToFirestore(uid) {
+  try {
+    const data = {};
+    SYNC_KEYS.forEach(k => { try { const v=localStorage.getItem(k); data[k]=v!=null?JSON.parse(v):null; } catch{} });
+    await _db.collection('users').doc(uid).set(data);
+  } catch(err) { console.error('Firestore push error:', err); }
+}
+
+// 1.5秒デバウンスで自動同期
+function scheduleSync() {
+  if (!_currentUser) return;
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(() => pushToFirestore(_currentUser.uid), 1500);
+}
+
+// 認証状態の監視
+_auth.onAuthStateChanged(async user => {
+  _currentUser = user;
+  if (user) {
+    await loadFromFirestore(user.uid);
+  }
+  if (_onAuthChangeCb) _onAuthChangeCb(user);
+});
+
 const e = React.createElement;
 const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
 // ── storage helper ──────────────────────────────────────────────
 const ls = {
   get:(k,d)=>{ try{ const v=localStorage.getItem(k); return v!=null?JSON.parse(v):d; }catch{ return d; } },
-  set:(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} },
+  set:(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} scheduleSync(); },
 };
 
 // ── constants ───────────────────────────────────────────────────
@@ -380,7 +452,13 @@ function calcStreak(tl) {
 }
 function calcPerfectDays(todos){
   const td=todayStr();
-  return Object.entries(todos).filter(([k,l])=>k<td&&l&&l.length>0&&l.every(t=>t.done)).length;
+  // 過去の日 + 今日（全完了済みなら）
+  return Object.entries(todos).filter(([k,l])=>{
+    if(!l||l.length===0)return false;
+    if(k>td)return false; // 未来は除外
+    if(k<td)return l.every(t=>t.done); // 過去は全完了
+    return l.every(t=>t.done); // 今日も全完了なら含める
+  }).length;
 }
 function countTodoDone(todos){return Object.values(todos).flat().filter(t=>t.done).length;}
 
@@ -1018,8 +1096,29 @@ function App() {
   const [confetti,setConfetti]=useState(false);
   const [toasts,setToasts]=useState([]);
   const [unlocked,setUnlocked]=useState(()=>new Set(ls.get('kc-unlocked',[])));
+  const [authUser,setAuthUser]=useState(null);   // ← 追加
+  const [syncing,setSyncing]=useState(false);     // ← 追加
+  const [syncKey,setSyncKey]=useState(0);          // ← ページ強制再描画用
   const closeTimer=useRef(null);
   const achQueued=useRef(false);
+
+  // Firebase認証状態の監視
+  useEffect(()=>{
+    _onAuthChangeCb = async (user) => {
+      setAuthUser(user);
+      if(user){
+        setSyncing(true);
+        await loadFromFirestore(user.uid);
+        setSyncing(false);
+        setSyncKey(k=>k+1); // データ読み込み後に全画面を再描画
+        setUnlocked(new Set(ls.get('kc-unlocked',[])));
+      }
+    };
+    return ()=>{ _onAuthChangeCb=null; };
+  },[]);
+
+  const login  = ()=>_auth.signInWithPopup(_provider).catch(err=>console.error(err));
+  const logout = ()=>{ _auth.signOut(); };
 
   const openMenu=()=>{clearTimeout(closeTimer.current);setMenuOpen(true);};
   const closeMenu=()=>{closeTimer.current=setTimeout(()=>setMenuOpen(false),180);};
@@ -1078,20 +1177,39 @@ function App() {
         e('span'),e('span'),e('span'),
       ),
       e('span',{className:'logo',onClick:()=>nav('home')},'Karaagechan'),
+      e('div',{className:'hdr-spacer'}),
+      // 同期インジケーター
+      authUser && e('span',{className:'sync-dot'+(syncing?' syncing':''),title:syncing?'同期中...':'同期済み'}),
+      // ログイン/ユーザー表示
+      authUser
+        ? e('button',{className:'auth-user',onClick:logout,title:'クリックでログアウト'},
+            authUser.photoURL
+              ? e('img',{className:'auth-avatar',src:authUser.photoURL,alt:''})
+              : e('span',{style:{fontSize:'1.1rem'}},'👤'),
+            e('span',{className:'auth-name'},authUser.displayName||'ユーザー'),
+          )
+        : e('button',{className:'auth-btn',onClick:login},'🔑 Googleでログイン'),
     ),
     e('div',{className:'drawer'+(menuOpen?' open':''),onMouseEnter:openMenu,onMouseLeave:closeMenu},
       e('div',{className:'d-logo'},'🍗 Karaagechan'),
+      authUser && e('div',{style:{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',marginBottom:8,background:'#F5EFFE',borderRadius:12}},
+        authUser.photoURL && e('img',{src:authUser.photoURL,style:{width:28,height:28,borderRadius:'50%'}}),
+        e('div',null,
+          e('div',{style:{fontSize:'.75rem',fontWeight:800,color:'#7A50A0'}},authUser.displayName),
+          e('div',{style:{fontSize:'.62rem',color:'#9B8FAA'}},'同期: ON ☁️'),
+        ),
+      ),
       e('button',{className:'d-item'+(view==='home'?' active':''),onClick:()=>nav('home')},'🏠 ホーム'),
       e('button',{className:'d-item'+(view==='calendar'?' active':''),onClick:()=>nav('calendar')},'📅 カレンダー'),
       e('button',{className:'d-item'+(view==='stats'?' active':''),onClick:()=>nav('stats')},'📊 統計'),
       e('button',{className:'d-item'+(view==='achievements'?' active':''),onClick:()=>nav('achievements')},'🏆 実績'),
       e('button',{className:'d-item dim',disabled:true},'⚙️ 設定 ',e('small',{style:{fontSize:'.62rem',marginLeft:2}},'(準備中)')),
     ),
-    // ページ本体（key変更でフェードイン発火）
-    view==='home'         && e('div',{key:'home',   className:'page-fade'},e(HomeScreen,{goCalendar:()=>nav('calendar')})),
-    view==='calendar'     && e('div',{key:'cal',    className:'page-fade'},e(CalendarScreen,{onAllTodosDone,onDataChange:checkAch})),
-    view==='stats'        && e('div',{key:'stats',  className:'page-fade'},e(StatsScreen)),
-    view==='achievements' && e('div',{key:'ach',    className:'page-fade'},e(AchievementsScreen)),
+    // ページ本体（syncKeyでデータ再読込後に再描画）
+    view==='home'         && e('div',{key:'home'+syncKey,   className:'page-fade'},e(HomeScreen,{goCalendar:()=>nav('calendar')})),
+    view==='calendar'     && e('div',{key:'cal'+syncKey,    className:'page-fade'},e(CalendarScreen,{onAllTodosDone,onDataChange:checkAch})),
+    view==='stats'        && e('div',{key:'stats'+syncKey,  className:'page-fade'},e(StatsScreen)),
+    view==='achievements' && e('div',{key:'ach'+syncKey,    className:'page-fade'},e(AchievementsScreen)),
     // 演出系
     e(ToastList,{toasts}),
     e(Confetti,{active:confetti,onDone:()=>setConfetti(false)}),
