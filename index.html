@@ -12,6 +12,22 @@ html,body,#root{height:100%;}
 body{font-family:'Nunito',sans-serif;color:#4A3F55;background:#FDF6FF;min-height:100vh;}
 @keyframes kc-burst{0%{transform:rotate(var(--a)) translateY(0) scale(1.2);opacity:1;}55%{opacity:1;}100%{transform:rotate(var(--a)) translateY(-24px) scale(0);opacity:0;}}
 @keyframes kc-pop{0%{transform:scale(1);}40%{transform:scale(1.35);}100%{transform:scale(1);}}
+@keyframes toast-in{from{transform:translateX(120%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes toast-out{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(120%);}}
+@keyframes page-fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pom-flash{0%,100%{background:inherit;}50%{box-shadow:0 0 0 6px rgba(201,168,224,.4);}}
+.page-fade{animation:page-fade .3s ease both;}
+.confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:9999;}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9998;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
+.toast{background:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 4px 24px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px;min-width:240px;border-left:4px solid #C9A8E0;font-family:'Nunito',sans-serif;}
+.toast.major{border-left-color:#F0508A;}
+.toast.in{animation:toast-in .4s ease forwards;}
+.toast.out{animation:toast-out .4s ease forwards;}
+.toast-icon{font-size:1.5rem;flex-shrink:0;}
+.toast-badge{font-size:.6rem;font-weight:700;color:#C9A8E0;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:1px;}
+.toast.major .toast-badge{color:#F0508A;}
+.toast-title{font-size:.8rem;font-weight:800;color:#3A2F45;}
+.toast-desc{font-size:.68rem;font-weight:600;color:#9B8FAA;margin-top:1px;}
 /* HEADER */
 .hdr{position:sticky;top:0;z-index:100;background:rgba(253,246,255,.94);backdrop-filter:blur(10px);border-bottom:1.5px solid #EAE0F5;height:54px;display:flex;align-items:center;gap:14px;padding:0 20px;}
 .burger{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:7px;border-radius:8px;transition:background .15s;}
@@ -387,7 +403,74 @@ function buildChart(tl,cats,period) {
   }));
 }
 
-// ── StatusIcon ──────────────────────────────────────────────────
+// ── SOUND ────────────────────────────────────────────────────────
+let _ac=null;
+function getAC(){if(!_ac&&(window.AudioContext||window.webkitAudioContext))_ac=new(window.AudioContext||window.webkitAudioContext)();return _ac;}
+function tone(freq,dur,vol,delay){
+  try{const ac=getAC();if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=freq;const t=ac.currentTime+(delay||0);g.gain.setValueAtTime(vol||.28,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.start(t);o.stop(t+dur);}catch(e){}
+}
+function sndTodoDone(){[[523,.15,.3],[659,.15,.3],[784,.15,.3],[1047,.35,.35]].forEach(([f,d,v],i)=>tone(f,d,v,i*.12));}
+function sndAch(major){
+  if(major)[[523,.2,.35],[659,.2,.35],[784,.2,.35],[880,.2,.35],[1047,.45,.4]].forEach(([f,d,v],i)=>tone(f,d,v,i*.15));
+  else{tone(880,.1,.25);tone(1108,.22,.25,.13);}
+}
+function sndPomSwitch(toWork){
+  if(toWork){tone(440,.1,.2);tone(550,.1,.2,.13);tone(660,.22,.2,.26);}
+  else{tone(660,.1,.2);tone(550,.1,.2,.13);tone(440,.22,.2,.26);}
+}
+
+// ── CONFETTI ─────────────────────────────────────────────────────
+function Confetti({active,onDone}){
+  const ref=useRef(null);
+  useEffect(()=>{
+    if(!active)return;
+    const cv=ref.current;if(!cv)return;
+    const ctx=cv.getContext('2d');
+    cv.width=window.innerWidth;cv.height=window.innerHeight;
+    const cols=['#C9A8E0','#F0508A','#4FA8F5','#FFD97D','#2EB87A','#FF8FAB','#A880D0'];
+    const pieces=Array.from({length:130},()=>({
+      x:Math.random()*cv.width,y:-20,
+      vx:(Math.random()-.5)*5,vy:3+Math.random()*5,
+      color:cols[Math.floor(Math.random()*cols.length)],
+      w:7+Math.random()*9,h:5+Math.random()*7,
+      rot:Math.random()*360,vr:(Math.random()-.5)*9,
+    }));
+    let fr,start=performance.now();
+    const draw=()=>{
+      const el=performance.now()-start;
+      ctx.clearRect(0,0,cv.width,cv.height);
+      let alive=false;
+      pieces.forEach(p=>{
+        p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.rot+=p.vr;
+        if(p.y<cv.height+20)alive=true;
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle=p.color;ctx.globalAlpha=Math.max(0,1-el/3200);
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+      });
+      if(alive&&el<3200)fr=requestAnimationFrame(draw);
+      else{ctx.clearRect(0,0,cv.width,cv.height);onDone&&onDone();}
+    };
+    fr=requestAnimationFrame(draw);
+    return()=>cancelAnimationFrame(fr);
+  },[active]);
+  if(!active)return null;
+  return e('canvas',{ref,className:'confetti-canvas'});
+}
+
+// ── TOAST ────────────────────────────────────────────────────────
+function ToastList({toasts}){
+  if(!toasts.length)return null;
+  return e('div',{className:'toast-wrap'},
+    toasts.map(t=>e('div',{key:t.id,className:'toast'+(t.major?' major':'')+(t.leaving?' out':' in')},
+      e('span',{className:'toast-icon'},t.icon),
+      e('div',null,
+        e('span',{className:'toast-badge'},'🏆 実績解除！'),
+        e('div',{className:'toast-title'},t.title),
+        e('div',{className:'toast-desc'},t.desc),
+      ),
+    ))
+  );
+}
 function StatusIcon({status,sel}) {
   if(!status) return null;
   const map={circle:['○',sel?'rgba(255,255,255,.9)':'#2EB87A'],tri:['△',sel?'rgba(255,255,255,.9)':'#D48C10'],cross:['✕',sel?'rgba(255,255,255,.9)':'#D85050']};
@@ -488,6 +571,7 @@ function TimerSection({onchange}) {
   const [pomCycles,setPomCycles]=useState(()=>ls.get('kc-pom-cycles',0));
   const [swSecs,setSwSecs]=useState(0);
   const [swRun,setSwRun]=useState(false);
+  const [pomFlash,setPomFlash]=useState(false);
   const modeRef=useRef('work');
   const [timerCats,setTimerCats]=useState(()=>ls.get('kc-timer-cats',[]));
   const [activeCat,setActiveCat]=useState(null);
@@ -512,7 +596,17 @@ function TimerSection({onchange}) {
     const id=setInterval(()=>{
       if(modeRef.current==='work')tick();
       setPomSecs(prev=>{
-        if(prev<=1){if(modeRef.current==='work'){modeRef.current='break';setPomMode('break');setPomCycles(c=>c+1);return BREAK_TIME;}else{modeRef.current='work';setPomMode('work');return WORK_TIME;}}
+        if(prev<=1){
+          if(modeRef.current==='work'){
+            modeRef.current='break';setPomMode('break');setPomCycles(c=>c+1);
+            sndPomSwitch(false);setPomFlash(true);setTimeout(()=>setPomFlash(false),700);
+            return BREAK_TIME;
+          }else{
+            modeRef.current='work';setPomMode('work');
+            sndPomSwitch(true);setPomFlash(true);setTimeout(()=>setPomFlash(false),700);
+            return WORK_TIME;
+          }
+        }
         return prev-1;
       });
     },1000);
@@ -545,7 +639,7 @@ function TimerSection({onchange}) {
       e('button',{className:'timer-tab'+(tab==='stopwatch'?' on':''),onClick:()=>setTab('stopwatch')},'⏱ ストップウォッチ'),
     ),
     tab==='pomodoro' && [
-      e('div',{key:'badge',className:'pom-badge'+(pomMode==='work'?' work':' brk')},pomMode==='work'?'🍅 作業中':'☕ 休憩中'),
+      e('div',{key:'badge',className:'pom-badge'+(pomMode==='work'?' work':' brk'),style:pomFlash?{animation:'pom-flash .6s ease',outline:'3px solid currentColor',outlineOffset:2}:{}},pomMode==='work'?'🍅 作業中':'☕ 休憩中'),
       e('div',{key:'disp',className:'timer-display'},fmtMS(pomSecs)),
       e('div',{key:'bar',className:'pom-bar-wrap'},e('div',{className:'pom-bar-fill',style:{width:prog+'%'}})),
       e('div',{key:'ctrl',className:'timer-controls'},
@@ -656,7 +750,7 @@ function HomeScreen({goCalendar}) {
 
 // ── CalendarScreen ──────────────────────────────────────────────
 // 変更③: 過去の日付はロック
-function CalendarScreen() {
+function CalendarScreen({onAllTodosDone,onDataChange}) {
   const today=new Date();
   const [year,setYear]=useState(today.getFullYear());
   const [month,setMonth]=useState(today.getMonth());
@@ -672,7 +766,7 @@ function CalendarScreen() {
   const [newCatColor,setNewCatColor]=useState(COLOR_PRESETS[0]);
   const [customColor,setCustomColor]=useState('#C9A8E0');
 
-  useEffect(()=>{ls.set('kc-todos',todos);},[todos]);
+  useEffect(()=>{ls.set('kc-todos',todos);onDataChange&&onDataChange();},[todos]);
   useEffect(()=>{ls.set('kc-custom-cats',customCats);},[customCats]);
 
   const allCats=[...DEFAULT_CATS,...customCats];
@@ -695,7 +789,12 @@ function CalendarScreen() {
     if(isPast)return;
     const t=(todos[selKey]||[]).find(t=>t.id===id);if(!t)return;
     if(!t.done){setBursting(p=>new Set([...p,id]));setTimeout(()=>setBursting(p=>{const n=new Set(p);n.delete(id);return n;}),620);}
-    setTodos(p=>({...p,[selKey]:(p[selKey]||[]).map(t=>t.id===id?{...t,done:!t.done}:t)}));
+    const newList=(todos[selKey]||[]).map(t=>t.id===id?{...t,done:!t.done}:t);
+    setTodos(p=>({...p,[selKey]:newList}));
+    // 今日のtodoが全部完了したら演出
+    const isTodayKey=selKey===todayStr();
+    const allDone=!t.done&&newList.length>0&&newList.every(t=>t.done);
+    if(isTodayKey&&allDone)onAllTodosDone&&onAllTodosDone();
   };
   const delTodo=(id)=>{if(!isPast)setTodos(p=>({...p,[selKey]:(p[selKey]||[]).filter(t=>t.id!==id)}));};
   const prevM=()=>{if(month===0){setYear(y=>y-1);setMonth(11);}else setMonth(m=>m-1);setSelDay(1);};
@@ -914,11 +1013,62 @@ function AchievementsScreen() {
 function App() {
   const [view,setView]=useState('home');
   const [menuOpen,setMenuOpen]=useState(false);
+  const [confetti,setConfetti]=useState(false);
+  const [toasts,setToasts]=useState([]);
+  const [unlocked,setUnlocked]=useState(()=>new Set(ls.get('kc-unlocked',[])));
   const closeTimer=useRef(null);
+  const achQueued=useRef(false);
 
   const openMenu=()=>{clearTimeout(closeTimer.current);setMenuOpen(true);};
   const closeMenu=()=>{closeTimer.current=setTimeout(()=>setMenuOpen(false),180);};
   const nav=v=>{setView(v);setMenuOpen(false);};
+
+  // 実績チェック
+  const checkAch=useCallback(()=>{
+    if(achQueued.current)return;
+    achQueued.current=true;
+    setTimeout(()=>{
+      achQueued.current=false;
+      try{
+        const tl=ls.get('kc-timer-log',{});
+        const todos=ls.get('kc-todos',{});
+        const pom=ls.get('kc-pom-cycles',0);
+        const nowH=new Date().getHours();
+        const sm={
+          streak:calcStreak(tl),total:getAllTotal(tl),weekly:getWeekSecs(tl),
+          pom,perfect_days:calcPerfectDays(todos),todo_done:countTodoDone(todos),
+          early_bird:nowH<6?1:0,
+        };
+        const stored=new Set(ls.get('kc-unlocked',[]));
+        const newOnes=[];
+        ACHIEVEMENTS_DEF.forEach(a=>{if(!stored.has(a.id)&&(sm[a.type]||0)>=a.threshold){newOnes.push(a);stored.add(a.id);}});
+        if(newOnes.length){
+          ls.set('kc-unlocked',[...stored]);
+          setUnlocked(new Set(stored));
+          newOnes.forEach((a,i)=>setTimeout(()=>{
+            const id=Date.now()+i;
+            setToasts(t=>[...t,{id,icon:a.icon,title:a.title,desc:a.desc,major:a.major,leaving:false}]);
+            sndAch(a.major);
+            if(a.major)setConfetti(true);
+            setTimeout(()=>{
+              setToasts(t=>t.map(x=>x.id===id?{...x,leaving:true}:x));
+              setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),420);
+            },4200);
+          },i*700));
+        }
+      }catch(err){}
+    },400);
+  },[]);
+
+  // Todo全完了コールバック
+  const onAllTodosDone=useCallback(()=>{
+    sndTodoDone();
+    setConfetti(true);
+    checkAch();
+  },[checkAch]);
+
+  // ページ切り替えで実績チェック
+  useEffect(()=>{checkAch();},[view]);
 
   return e('div',null,
     e('header',{className:'hdr'},
@@ -935,10 +1085,14 @@ function App() {
       e('button',{className:'d-item'+(view==='achievements'?' active':''),onClick:()=>nav('achievements')},'🏆 実績'),
       e('button',{className:'d-item dim',disabled:true},'⚙️ 設定 ',e('small',{style:{fontSize:'.62rem',marginLeft:2}},'(準備中)')),
     ),
-    view==='home'         && e(HomeScreen,{key:'home',goCalendar:()=>nav('calendar')}),
-    view==='calendar'     && e(CalendarScreen,{key:'cal'}),
-    view==='stats'        && e(StatsScreen,{key:'stats'}),
-    view==='achievements' && e(AchievementsScreen,{key:'ach'}),
+    // ページ本体（key変更でフェードイン発火）
+    view==='home'         && e('div',{key:'home',   className:'page-fade'},e(HomeScreen,{goCalendar:()=>nav('calendar')})),
+    view==='calendar'     && e('div',{key:'cal',    className:'page-fade'},e(CalendarScreen,{onAllTodosDone,onDataChange:checkAch})),
+    view==='stats'        && e('div',{key:'stats',  className:'page-fade'},e(StatsScreen)),
+    view==='achievements' && e('div',{key:'ach',    className:'page-fade'},e(AchievementsScreen)),
+    // 演出系
+    e(ToastList,{toasts}),
+    e(Confetti,{active:confetti,onDone:()=>setConfetti(false)}),
   );
 }
 
