@@ -237,6 +237,74 @@ input[type=color]::-webkit-color-swatch{border:2px solid #EAE0F5;border-radius:5
 .ach-progress{margin-top:6px;background:#EAE0F5;border-radius:4px;height:4px;overflow:hidden;}
 .ach-progress-fill{height:100%;background:linear-gradient(90deg,#C9A8E0,#A880D0);border-radius:4px;transition:width .5s ease;}
 .ach-summary{background:#fff;border-radius:18px;padding:12px 16px;border:1.5px solid #EAE0F5;margin-bottom:16px;display:inline-flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:#6A5F75;}
+/* DIARY */
+.diary-wrap{padding:18px 24px 28px;max-width:860px;margin:0 auto;min-height:calc(100vh - 54px);}
+.diary-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.diary-title{font-size:1.25rem;font-weight:800;color:#3A2F45;display:flex;align-items:center;gap:8px;}
+.diary-count{font-size:.78rem;color:#9B8FAA;font-weight:500;margin-left:8px;}
+.diary-new-btn{background:#C9A8E0;color:#fff;border:none;border-radius:10px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;transition:background .15s;}
+.diary-new-btn:hover{background:#B890D4;}
+.diary-search{width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #EAE0F5;background:#fff;font-size:.84rem;font-family:'Nunito',sans-serif;color:#4A3F55;margin-bottom:12px;outline:none;}
+.diary-search:focus{border-color:#C9A8E0;}
+.diary-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}
+.diary-filter-label{font-size:.78rem;color:#9B8FAA;font-weight:700;flex-shrink:0;}
+.diary-chip{padding:4px 12px;border-radius:18px;font-size:.76rem;font-weight:700;border:1.5px solid #EAE0F5;background:#fff;color:#4A3F55;cursor:pointer;transition:all .18s;font-family:'Nunito',sans-serif;}
+.diary-chip:hover{background:#F5EFFE;}
+.diary-chip.on{border-color:#C9A8E0;background:#C9A8E0;color:#fff;}
+.diary-mood-chip{padding:5px 9px;border-radius:18px;font-size:1rem;border:1.5px solid #EAE0F5;background:#fff;cursor:pointer;transition:all .18s;}
+.diary-mood-chip:hover{background:#F5EFFE;}
+.diary-mood-chip.on{border-color:#C9A8E0;background:#EDE0F8;}
+.diary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.diary-card{background:#fff;border-radius:16px;border:1.5px solid #EAE0F5;overflow:hidden;cursor:pointer;box-shadow:0 2px 12px rgba(180,140,220,.08);transition:transform .18s,box-shadow .18s;position:relative;animation:page-fade .3s ease both;}
+.diary-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(180,140,220,.18);}
+.diary-card-img{width:100%;height:140px;overflow:hidden;}
+.diary-card-img img{width:100%;height:100%;object-fit:cover;}
+.diary-card-body{padding:14px 16px 12px;}
+.diary-card-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.diary-card-date{font-size:.72rem;color:#9B8FAA;font-weight:600;}
+.diary-card-title{font-size:.92rem;font-weight:800;color:#3A2F45;margin-bottom:4px;}
+.diary-card-preview{font-size:.78rem;color:#9B8FAA;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.diary-card-del{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.9);font-size:.84rem;color:#9B8FAA;display:none;align-items:center;justify-content:center;border:none;cursor:pointer;font-family:'Nunito',sans-serif;}
+.diary-card:hover .diary-card-del{display:flex;}
+.diary-card-del:hover{background:#FFE8E8;color:#D85050;}
+.diary-del-confirm{position:absolute;inset:0;background:rgba(253,246,255,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:16px;padding:20px;z-index:2;}
+.diary-tag{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:3px;}
+.diary-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9B8FAA;font-size:.82rem;gap:12px;padding:60px 0;text-align:center;}
+/* DIARY EDITOR */
+.diary-ed-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.diary-back-btn{font-size:.84rem;color:#9B8FAA;font-weight:600;background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;padding:6px 0;}
+.diary-back-btn:hover{color:#7A50A0;}
+.diary-save-btn{background:#C9A8E0;color:#fff;border:none;border-radius:10px;padding:8px 18px;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;}
+.diary-save-btn:hover{background:#B890D4;}
+.diary-edit-btn{background:#EDE0F8;color:#7A50A0;border:none;border-radius:10px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;}
+.diary-edit-btn:hover{background:#DDD0F0;}
+.diary-title-input{width:100%;font-size:1.4rem;font-weight:900;border:none;background:transparent;color:#3A2F45;margin-bottom:16px;font-family:'Nunito',sans-serif;outline:none;}
+.diary-title-input::placeholder{color:#C8BAD8;}
+.diary-meta-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-start;}
+.diary-mood-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:10px;border:1.5px solid #EAE0F5;background:#fff;font-size:1rem;cursor:pointer;font-family:'Nunito',sans-serif;transition:border-color .15s;}
+.diary-mood-btn:hover{border-color:#C9A8E0;}
+.diary-mood-dd{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1.5px solid #EAE0F5;border-radius:14px;box-shadow:0 8px 28px rgba(180,140,220,.18);padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px;z-index:10;min-width:200px;}
+.diary-mood-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:none;background:none;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .12s;}
+.diary-mood-opt:hover{background:#F5EFFE;}
+.diary-mood-opt.on{background:#EDE0F8;}
+.diary-tag-input{padding:6px 10px;border-radius:8px;border:1.5px solid #EAE0F5;background:#fff;font-size:.78rem;font-family:'Nunito',sans-serif;color:#4A3F55;width:100%;max-width:180px;outline:none;}
+.diary-tag-input:focus{border-color:#C9A8E0;}
+.diary-textarea{width:100%;min-height:80px;padding:12px 14px;border-radius:14px;border:1.5px solid #EAE0F5;background:#fff;font-size:.88rem;font-family:'Nunito',sans-serif;color:#4A3F55;line-height:1.9;resize:none;overflow:hidden;transition:border-color .2s;outline:none;}
+.diary-textarea:focus{border-color:#C9A8E0;}
+.diary-img-block{border-radius:14px;border:1.5px solid #EAE0F5;overflow:hidden;background:#fff;margin-bottom:4px;}
+.diary-img-block img{width:100%;display:block;}
+.diary-img-caption{width:100%;padding:8px 12px;border:none;border-top:1.5px solid #EAE0F5;font-size:.78rem;font-family:'Nunito',sans-serif;color:#9B8FAA;background:transparent;outline:none;}
+.diary-insert-bar{display:flex;align-items:center;gap:6px;padding:5px 0;opacity:0;transition:opacity .2s;}
+.diary-block-wrap:hover .diary-insert-bar{opacity:1;}
+.diary-insert-btn{width:26px;height:26px;border-radius:6px;border:1.5px solid #EAE0F5;background:#fff;font-size:.7rem;color:#9B8FAA;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .12s;}
+.diary-insert-btn:hover{background:#F5EFFE;border-color:#C9A8E0;}
+.diary-divider{border:none;border-top:1.5px dashed #EAE0F5;margin:8px 0;}
+.diary-paste-hint{text-align:center;font-size:.72rem;color:#C0B0D0;padding:12px 0 24px;}
+.diary-article-text{font-size:.92rem;line-height:2;color:#4A3F55;margin-bottom:16px;white-space:pre-wrap;}
+.diary-article-fig{margin:20px 0;border-radius:14px;overflow:hidden;}
+.diary-article-fig img{width:100%;border-radius:14px;}
+.diary-article-caption{font-size:.78rem;color:#9B8FAA;text-align:center;padding:8px 0;font-style:italic;}
+.diary-article-divider{border:none;border-top:1.5px solid #EAE0F5;margin:24px 0;}
 </style>
 </head>
 <body>
@@ -263,7 +331,7 @@ const _db   = firebase.firestore();
 const _provider = new firebase.auth.GoogleAuthProvider();
 
 // 同期対象キー
-const SYNC_KEYS = ['kc-todos','kc-custom-cats','kc-timer-log','kc-timer-cats','kc-pom-cycles','kc-unlocked'];
+const SYNC_KEYS = ['kc-todos','kc-custom-cats','kc-timer-log','kc-timer-cats','kc-pom-cycles','kc-unlocked','kc-diary-entries'];
 let _currentUser = null;
 let _syncTimer = null;
 let _onAuthChangeCb = null; // Appから登録するコールバック
@@ -797,7 +865,7 @@ function BarChart({data}) {
 
 // ── HomeScreen ──────────────────────────────────────────────────
 // 変更②: 天気をフル幅、ボタンを横並びに
-function HomeScreen({goCalendar}) {
+function HomeScreen({goCalendar,goDiary}) {
   const today=new Date();
   const y=today.getFullYear(),m=today.getMonth()+1,d=today.getDate();
   const key=toKey(y,m-1,d);
@@ -805,6 +873,7 @@ function HomeScreen({goCalendar}) {
   const [todos]=useState(()=>ls.get('kc-todos',{}));
   const todayTodos=todos[key]||[];
   const remaining=todayTodos.filter(t=>!t.done).length;
+  const diaryEntries=ls.get('kc-diary-entries',[]);
 
   return e('div',{className:'home-wrap dot-bg'},
     e('div',{className:'home-date-section'},
@@ -823,7 +892,14 @@ function HomeScreen({goCalendar}) {
         ),
         e('span',{style:{opacity:.6}},'›'),
       ),
-      e('div',{className:'action-space'},'ここにボタンを追加予定'),
+      e('button',{className:'action-btn',style:{background:'linear-gradient(135deg,#B890D4,#9B70C0)',boxShadow:'0 4px 14px rgba(155,112,192,.4)'},onClick:goDiary},
+        e('span',{style:{fontSize:'1.4rem'}},'📓'),
+        e('div',{style:{flex:1}},
+          e('div',null,'日記を書く'),
+          e('div',{className:'action-btn-sub'},diaryEntries.length>0?diaryEntries.length+' 件の記録':'思考を記録しよう'),
+        ),
+        e('span',{style:{opacity:.6}},'›'),
+      ),
     ),
   );
 }
@@ -1089,6 +1165,247 @@ function AchievementsScreen() {
   );
 }
 
+// ── DIARY ────────────────────────────────────────────────────────
+const DIARY_MOODS = [
+  {emoji:'😊',label:'Happy'},{emoji:'🤔',label:'Thinking'},
+  {emoji:'😌',label:'Calm'},{emoji:'🔥',label:'Motivated'},
+  {emoji:'😴',label:'Tired'},{emoji:'😢',label:'Sad'},
+  {emoji:'🎉',label:'Excited'},{emoji:'😤',label:'Frustrated'},
+];
+const DIARY_TAG_COLORS = ['#E87B4A','#4FA8F5','#2EB87A','#D4A000','#9B59B6','#F0508A','#1ABC9C','#E74C3C'];
+const diaryFmtDate = ds => new Date(ds).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+const diaryFmtTime = ds => new Date(ds).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+const mkTextBlock = (txt='') => ({id:Date.now()+Math.random(),type:'text',content:txt});
+const mkImageBlock = (src,cap='') => ({id:Date.now()+Math.random(),type:'image',src,caption:cap});
+const mkDividerBlock = () => ({id:Date.now()+Math.random(),type:'divider'});
+
+function DiaryScreen({onBack}) {
+  const [entries,setEntries] = useState(()=>ls.get('kc-diary-entries',[]));
+  const [view,setView] = useState('list');
+  const [editing,setEditing] = useState(null);
+  const [search,setSearch] = useState('');
+  const [fMood,setFMood] = useState(null);
+  const [fYear,setFYear] = useState(null);
+  const [fMonth,setFMonth] = useState(null);
+  const [delConfirm,setDelConfirm] = useState(null);
+
+  useEffect(()=>{ls.set('kc-diary-entries',entries);},[entries]);
+
+  const createNew = () => {
+    const entry = {id:Date.now().toString(),title:'',blocks:[mkTextBlock()],mood:null,tags:[],createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+    setEditing(entry); setView('editor');
+  };
+  const saveEntry = (entry) => {
+    const updated = {...entry, updatedAt:new Date().toISOString()};
+    setEntries(prev => {
+      const idx = prev.findIndex(x=>x.id===updated.id);
+      if(idx>=0){const n=[...prev];n[idx]=updated;return n;}
+      return [updated,...prev];
+    });
+    setView('list'); setEditing(null);
+  };
+  const deleteEntry = (id) => {
+    setEntries(prev=>prev.filter(x=>x.id!==id));
+    setDelConfirm(null); setView('list'); setEditing(null);
+  };
+
+  const filtered = entries.filter(x=>{
+    if(fMood && x.mood!==fMood) return false;
+    if(fYear){const d=new Date(x.createdAt);if(d.getFullYear()!==fYear)return false;if(fMonth!==null&&d.getMonth()!==fMonth)return false;}
+    if(search){const q=search.toLowerCase();return (x.title||'').toLowerCase().includes(q)||x.blocks.filter(b=>b.type==='text').map(b=>b.content).join(' ').toLowerCase().includes(q)||x.tags.some(t=>t.toLowerCase().includes(q));}
+    return true;
+  }).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+
+  const years = [...new Set(entries.map(x=>new Date(x.createdAt).getFullYear()))].sort((a,b)=>b-a);
+  const months = fYear ? [...new Set(entries.filter(x=>new Date(x.createdAt).getFullYear()===fYear).map(x=>new Date(x.createdAt).getMonth()))].sort((a,b)=>a-b) : [];
+  const MNAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  if(view==='editor'&&editing) return e(DiaryEditor,{entry:editing,onSave:saveEntry,onBack:()=>{setView('list');setEditing(null);}});
+  if(view==='detail'&&editing) return e(DiaryDetail,{entry:editing,onEdit:()=>setView('editor'),onBack:()=>{setView('list');setEditing(null);},onDelete:()=>deleteEntry(editing.id)});
+
+  return e('div',{className:'diary-wrap page-fade'},
+    e('div',{className:'diary-header'},
+      e('div',{className:'diary-title'},'📓 日記',e('span',{className:'diary-count'},entries.length+' entries')),
+      e('button',{className:'diary-new-btn',onClick:createNew},'＋ 新しい日記'),
+    ),
+    e('input',{className:'diary-search',placeholder:'🔍 日記を検索...',value:search,onChange:ev=>setSearch(ev.target.value)}),
+    // Year filter
+    years.length>0 && e('div',{className:'diary-filter-row'},
+      e('span',{className:'diary-filter-label'},'📅'),
+      years.map(y=>e('button',{key:y,className:'diary-chip'+(fYear===y?' on':''),onClick:()=>{setFYear(fYear===y?null:y);setFMonth(null);}},y+'年')),
+    ),
+    fYear&&months.length>0 && e('div',{className:'diary-filter-row',style:{paddingLeft:22}},
+      e('button',{className:'diary-chip'+(fMonth===null?' on':''),style:{fontStyle:'italic'},onClick:()=>setFMonth(null)},'全月'),
+      months.map(m=>e('button',{key:m,className:'diary-chip'+(fMonth===m?' on':''),onClick:()=>setFMonth(fMonth===m?null:m)},MNAMES[m])),
+    ),
+    // Mood filter
+    e('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}},
+      DIARY_MOODS.map(m=>e('button',{key:m.emoji,className:'diary-mood-chip'+(fMood===m.emoji?' on':''),onClick:()=>setFMood(fMood===m.emoji?null:m.emoji),title:m.label},m.emoji)),
+    ),
+    // Cards
+    filtered.length===0
+      ? e('div',{className:'diary-empty'},
+          e('span',{style:{fontSize:'2.5rem'}},'✍️'),
+          e('p',{style:{whiteSpace:'pre-line'}},entries.length===0?'まだ日記がありません。\n今日の思考を記録してみましょう。':'検索条件に一致する日記がありません。'),
+          entries.length===0 && e('button',{className:'diary-new-btn',onClick:createNew},'最初の日記を書く'),
+        )
+      : e('div',{className:'diary-grid'},
+          filtered.map(entry=>{
+            const preview = entry.blocks.filter(b=>b.type==='text').map(b=>b.content).join(' ').slice(0,100);
+            const firstImg = entry.blocks.find(b=>b.type==='image');
+            return e('div',{key:entry.id,className:'diary-card',onClick:()=>{setEditing(entry);setView('detail');}},
+              firstImg && e('div',{className:'diary-card-img'},e('img',{src:firstImg.src,alt:''})),
+              e('div',{className:'diary-card-body'},
+                e('div',{className:'diary-card-meta'},
+                  e('span',{className:'diary-card-date'},diaryFmtDate(entry.createdAt)),
+                  entry.mood && e('span',{style:{fontSize:'1.1rem'}},entry.mood),
+                ),
+                e('div',{className:'diary-card-title'},entry.title||'無題の日記'),
+                e('div',{className:'diary-card-preview'},preview||'（内容なし）'),
+                entry.tags.length>0 && e('div',{style:{display:'flex',gap:4,marginTop:8,flexWrap:'wrap'}},
+                  entry.tags.slice(0,3).map((t,i)=>e('span',{key:i,className:'diary-tag',style:{background:DIARY_TAG_COLORS[i%8]+'20',color:DIARY_TAG_COLORS[i%8]}},t)),
+                ),
+              ),
+              e('button',{className:'diary-card-del',onClick:ev=>{ev.stopPropagation();setDelConfirm(entry.id);},title:'削除'},'×'),
+              delConfirm===entry.id && e('div',{className:'diary-del-confirm',onClick:ev=>ev.stopPropagation()},
+                e('p',{style:{fontSize:'.84rem',color:'#4A3F55'}},'この日記を削除しますか？'),
+                e('div',{style:{display:'flex',gap:8}},
+                  e('button',{className:'nc-cancel',onClick:()=>setDelConfirm(null)},'キャンセル'),
+                  e('button',{className:'nc-save',style:{background:'#D85050'},onClick:()=>deleteEntry(entry.id)},'削除する'),
+                ),
+              ),
+            );
+          }),
+        ),
+  );
+}
+
+function DiaryDetail({entry,onEdit,onBack,onDelete}) {
+  return e('div',{className:'diary-wrap page-fade'},
+    e('div',{className:'diary-ed-header'},
+      e('button',{className:'diary-back-btn',onClick:onBack},'← 戻る'),
+      e('button',{className:'diary-edit-btn',onClick:onEdit},'✏️ 編集'),
+    ),
+    e('div',{style:{maxWidth:640,margin:'0 auto'}},
+      e('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:12}},
+        e('span',{style:{fontSize:'.85rem',color:'#9B8FAA'}},diaryFmtDate(entry.createdAt)),
+        entry.mood && e('span',{style:{fontSize:'1.4rem'}},entry.mood),
+      ),
+      e('h1',{style:{fontSize:'1.5rem',fontWeight:900,color:'#3A2F45',marginBottom:12,lineHeight:1.3}},entry.title||'無題の日記'),
+      entry.tags.length>0 && e('div',{style:{display:'flex',gap:6,marginBottom:20,flexWrap:'wrap'}},
+        entry.tags.map((t,i)=>e('span',{key:i,className:'diary-tag',style:{background:DIARY_TAG_COLORS[i%8]+'20',color:DIARY_TAG_COLORS[i%8]}},t)),
+      ),
+      entry.blocks.map(block=>{
+        if(block.type==='text') return e('p',{key:block.id,className:'diary-article-text'},block.content);
+        if(block.type==='image') return e('figure',{key:block.id,className:'diary-article-fig'},
+          e('img',{src:block.src,alt:block.caption||''}),
+          block.caption && e('figcaption',{className:'diary-article-caption'},block.caption),
+        );
+        if(block.type==='divider') return e('hr',{key:block.id,className:'diary-article-divider'});
+        return null;
+      }),
+    ),
+  );
+}
+
+function DiaryEditor({entry,onSave,onBack}) {
+  const [title,setTitle] = useState(entry.title);
+  const [blocks,setBlocks] = useState(entry.blocks.length?entry.blocks:[mkTextBlock()]);
+  const [mood,setMood] = useState(entry.mood);
+  const [tags,setTags] = useState(entry.tags);
+  const [tagIn,setTagIn] = useState('');
+  const [showMoods,setShowMoods] = useState(false);
+  const fileRef = useRef(null);
+  const insertRef = useRef(null);
+
+  const save = () => onSave({...entry,title,blocks,mood,tags});
+
+  const updateBlock = (id,u) => setBlocks(p=>p.map(b=>b.id===id?{...b,...u}:b));
+  const removeBlock = (id) => setBlocks(p=>p.length<=1?p:p.filter(b=>b.id!==id));
+  const addAfter = (afterId,block) => setBlocks(p=>{const i=p.findIndex(b=>b.id===afterId);const n=[...p];n.splice(i+1,0,block);return n;});
+
+  const onFiles = ev => {
+    Array.from(ev.target.files).forEach(f=>{
+      if(!f.type.startsWith('image/'))return;
+      const r=new FileReader();
+      r.onload=re=>{
+        const blk=mkImageBlock(re.target.result);
+        if(insertRef.current)addAfter(insertRef.current,blk);
+        else setBlocks(p=>[...p,blk]);
+      };
+      r.readAsDataURL(f);
+    });
+    ev.target.value='';
+  };
+
+  const onPaste = useCallback(ev=>{
+    const items=ev.clipboardData?.items;if(!items)return;
+    for(const it of items){
+      if(it.type.startsWith('image/')){
+        ev.preventDefault();
+        const f=it.getAsFile();const r=new FileReader();
+        r.onload=re=>setBlocks(p=>[...p,mkImageBlock(re.target.result)]);
+        r.readAsDataURL(f);break;
+      }
+    }
+  },[]);
+
+  const addTag = () => {const t=tagIn.trim();if(t&&!tags.includes(t))setTags([...tags,t]);setTagIn('');};
+
+  return e('div',{className:'diary-wrap page-fade',onPaste},
+    e('input',{type:'file',ref:fileRef,accept:'image/*',multiple:true,style:{display:'none'},onChange:onFiles}),
+    e('div',{className:'diary-ed-header'},
+      e('button',{className:'diary-back-btn',onClick:onBack},'← 戻る'),
+      e('button',{className:'diary-save-btn',onClick:save},'💾 保存'),
+    ),
+    e('div',{style:{maxWidth:640,margin:'0 auto'}},
+      e('input',{className:'diary-title-input',placeholder:'タイトルを入力...',value:title,onChange:ev=>setTitle(ev.target.value)}),
+      // Mood & Tags
+      e('div',{className:'diary-meta-row'},
+        e('div',{style:{position:'relative'}},
+          e('button',{className:'diary-mood-btn',onClick:()=>setShowMoods(!showMoods)},
+            mood||'😶',' ',e('span',{style:{fontSize:'.78rem',color:'#9B8FAA'}},mood?'気分':'気分を選択'),
+          ),
+          showMoods && e('div',{className:'diary-mood-dd'},
+            DIARY_MOODS.map(m=>e('button',{key:m.emoji,className:'diary-mood-opt'+(mood===m.emoji?' on':''),onClick:()=>{setMood(m.emoji);setShowMoods(false);}},
+              e('span',{style:{fontSize:'1.2rem'}},m.emoji),e('span',{style:{fontSize:'.72rem',color:'#9B8FAA'}},m.label),
+            )),
+            mood && e('button',{style:{gridColumn:'1/-1',fontSize:'.72rem',color:'#9B8FAA',textAlign:'center',padding:6,borderTop:'1.5px solid #EAE0F5',background:'none',border:'none',borderTop:'1.5px solid #EAE0F5',cursor:'pointer',fontFamily:"'Nunito',sans-serif"},onClick:()=>{setMood(null);setShowMoods(false);}},'クリア'),
+          ),
+        ),
+        e('div',{style:{flex:1}},
+          e('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginBottom:6}},
+            tags.map((t,i)=>e('span',{key:i,className:'diary-tag',style:{background:DIARY_TAG_COLORS[i%8]+'20',color:DIARY_TAG_COLORS[i%8]}},
+              t,' ',e('button',{style:{background:'none',border:'none',color:'inherit',cursor:'pointer',fontSize:'.78rem',opacity:.7,fontFamily:"'Nunito',sans-serif"},onClick:()=>setTags(tags.filter((_,j)=>j!==i))},'×'),
+            )),
+          ),
+          e('input',{className:'diary-tag-input',placeholder:'タグを追加... (Enter)',value:tagIn,onChange:ev=>setTagIn(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter'){ev.preventDefault();addTag();}}}),
+        ),
+      ),
+      // Blocks
+      blocks.map((block,idx)=>e('div',{key:block.id,className:'diary-block-wrap'},
+        block.type==='text' && e('textarea',{className:'diary-textarea',placeholder:'ここに思考を書き出しましょう...',value:block.content,rows:3,
+          onChange:ev=>{updateBlock(block.id,{content:ev.target.value});ev.target.style.height='auto';ev.target.style.height=ev.target.scrollHeight+'px';}}),
+        block.type==='image' && e('div',{className:'diary-img-block'},
+          e('img',{src:block.src,alt:block.caption||''}),
+          e('input',{className:'diary-img-caption',placeholder:'キャプションを追加...',value:block.caption,onChange:ev=>updateBlock(block.id,{caption:ev.target.value})}),
+        ),
+        block.type==='divider' && e('hr',{className:'diary-divider'}),
+        // Insert bar
+        e('div',{className:'diary-insert-bar'},
+          e('div',{style:{flex:1,height:1,background:'#EAE0F5'}}),
+          e('button',{className:'diary-insert-btn',onClick:()=>addAfter(block.id,mkTextBlock()),title:'テキスト追加'},'T'),
+          e('button',{className:'diary-insert-btn',onClick:()=>{insertRef.current=block.id;fileRef.current&&fileRef.current.click();},title:'画像追加'},'🖼'),
+          e('button',{className:'diary-insert-btn',onClick:()=>addAfter(block.id,mkDividerBlock()),title:'区切り線'},'—'),
+          blocks.length>1 && e('button',{className:'diary-insert-btn',style:{color:'#D85050'},onClick:()=>removeBlock(block.id),title:'削除'},'🗑'),
+          e('div',{style:{flex:1,height:1,background:'#EAE0F5'}}),
+        ),
+      )),
+      e('div',{className:'diary-paste-hint'},'💡 画像はクリップボードから直接ペーストもできます'),
+    ),
+  );
+}
+
 // ── App ─────────────────────────────────────────────────────────
 function App() {
   const [view,setView]=useState('home');
@@ -1201,13 +1518,15 @@ function App() {
       ),
       e('button',{className:'d-item'+(view==='home'?' active':''),onClick:()=>nav('home')},'🏠 ホーム'),
       e('button',{className:'d-item'+(view==='calendar'?' active':''),onClick:()=>nav('calendar')},'📅 カレンダー'),
+      e('button',{className:'d-item'+(view==='diary'?' active':''),onClick:()=>nav('diary')},'📓 日記'),
       e('button',{className:'d-item'+(view==='stats'?' active':''),onClick:()=>nav('stats')},'📊 統計'),
       e('button',{className:'d-item'+(view==='achievements'?' active':''),onClick:()=>nav('achievements')},'🏆 実績'),
       e('button',{className:'d-item dim',disabled:true},'⚙️ 設定 ',e('small',{style:{fontSize:'.62rem',marginLeft:2}},'(準備中)')),
     ),
     // ページ本体（syncKeyでデータ再読込後に再描画）
-    view==='home'         && e('div',{key:'home'+syncKey,   className:'page-fade'},e(HomeScreen,{goCalendar:()=>nav('calendar')})),
+    view==='home'         && e('div',{key:'home'+syncKey,   className:'page-fade'},e(HomeScreen,{goCalendar:()=>nav('calendar'),goDiary:()=>nav('diary')})),
     view==='calendar'     && e('div',{key:'cal'+syncKey,    className:'page-fade'},e(CalendarScreen,{onAllTodosDone,onDataChange:checkAch})),
+    view==='diary'        && e('div',{key:'diary'+syncKey, className:'page-fade'},e(DiaryScreen)),
     view==='stats'        && e('div',{key:'stats'+syncKey,  className:'page-fade'},e(StatsScreen)),
     view==='achievements' && e('div',{key:'ach'+syncKey,    className:'page-fade'},e(AchievementsScreen)),
     // 演出系
