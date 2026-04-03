@@ -449,7 +449,7 @@ const ACHIEVEMENTS_DEF = [
   {id:'m_pom1',  cat:'misc',icon:'🍅',title:'初ポモドーロ',         desc:'初めてポモドーロ完了',       threshold:1,  type:'pom',         major:false},
   {id:'m_pom10', cat:'misc',icon:'🍅',title:'ポモドーロ10回',       desc:'10セッション完了',          threshold:10, type:'pom',         major:false},
   {id:'m_pom100',cat:'misc',icon:'🍅',title:'ポモドーロの達人',     desc:'100セッション完了',         threshold:100,type:'pom',         major:true},
-  {id:'m_early', cat:'misc',icon:'🌅',title:'早起きは三文の徳',    desc:'6時前にアプリを起動',        threshold:1,  type:'early_bird',  major:false},
+  {id:'m_early', cat:'misc',icon:'🌅',title:'早起きは三文の徳',    desc:'朝4:30〜6:00にアプリを起動',  threshold:1,  type:'early_bird',  major:false},
 ];
 const ACH_CAT_LABELS = {streak:'🔥 連続記録',total:'⏱ 合計集中時間',weekly:'📅 週間集中時間',misc:'🎖 その他'};
 const WORK_TIME = 25*60, BREAK_TIME = 5*60;
@@ -1124,7 +1124,7 @@ function AchievementsScreen() {
     pom:          pom,
     perfect_days: calcPerfectDays(todos),
     todo_done:    countTodoDone(todos),
-    early_bird:   nowH<6?1:0,
+    early_bird:   (nowH===5||(nowH===4&&new Date().getMinutes()>=30))?1:0,
   };
 
   const isUnlocked = (ach) => (sm[ach.type]||0) >= ach.threshold;
@@ -1455,7 +1455,7 @@ function App() {
         const sm={
           streak:calcStreak(tl),total:getAllTotal(tl),weekly:getWeekSecs(tl),
           pom,perfect_days:calcPerfectDays(todos),todo_done:countTodoDone(todos),
-          early_bird:nowH<6?1:0,
+          early_bird:(nowH===5||(nowH===4&&new Date().getMinutes()>=30))?1:0,
         };
         const stored=new Set(ls.get('kc-unlocked',[]));
         const newOnes=[];
