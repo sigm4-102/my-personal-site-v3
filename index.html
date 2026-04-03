@@ -155,6 +155,9 @@ body{font-family:'Nunito',sans-serif;color:#4A3F55;background:#FDF6FF;min-height
 .color-swatch{width:19px;height:19px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .12s;display:inline-block;}
 .color-swatch.picked{border-color:#333;transform:scale(1.18);}
 .new-cat-actions{display:flex;gap:5px;}
+input[type=color]{width:22px;height:22px;border:none;border-radius:50%;cursor:pointer;padding:0;-webkit-appearance:none;appearance:none;flex-shrink:0;}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0;border-radius:50%;}
+input[type=color]::-webkit-color-swatch{border:2px solid #EAE0F5;border-radius:50%;}
 /* STATS */
 .stats-wrap{padding:22px 26px;min-height:calc(100vh - 54px);}
 .stats-title{font-size:1.25rem;font-weight:800;color:#3A2F45;margin-bottom:16px;}
@@ -188,6 +191,24 @@ body{font-family:'Nunito',sans-serif;color:#4A3F55;background:#FDF6FF;min-height
   .weather-inner{flex-direction:column;}.weather-divider{display:none;}
   .stats-body{grid-template-columns:1fr;}
 }
+/* ACHIEVEMENTS */
+.ach-page{padding:22px 26px;min-height:calc(100vh - 54px);}
+.ach-page-title{font-size:1.25rem;font-weight:800;color:#3A2F45;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.ach-cats{display:flex;flex-direction:column;gap:22px;}
+.ach-cat-title{font-size:.76rem;font-weight:800;color:#9B8FAA;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px;}
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.ach-card{border-radius:16px;padding:14px;display:flex;align-items:flex-start;gap:10px;border:1.5px solid #EAE0F5;transition:all .2s;}
+.ach-card.unlocked{background:#F5EFFE;border-color:#D4B8F0;box-shadow:0 2px 12px rgba(201,168,224,.2);}
+.ach-card.locked{background:#FAFAFA;opacity:.6;}
+.ach-card.major.unlocked{background:linear-gradient(135deg,#FFF5FB,#F0E8FF);border-color:#E0A8F0;}
+.ach-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.ach-card.unlocked .ach-icon{background:rgba(255,255,255,.7);}
+.ach-card.locked  .ach-icon{background:#F0EEF5;}
+.ach-name{font-size:.8rem;font-weight:800;color:#3A2F45;}
+.ach-desc{font-size:.66rem;font-weight:600;color:#9B8FAA;margin-top:2px;line-height:1.4;}
+.ach-progress{margin-top:6px;background:#EAE0F5;border-radius:4px;height:4px;overflow:hidden;}
+.ach-progress-fill{height:100%;background:linear-gradient(90deg,#C9A8E0,#A880D0);border-radius:4px;transition:width .5s ease;}
+.ach-summary{background:#fff;border-radius:18px;padding:12px 16px;border:1.5px solid #EAE0F5;margin-bottom:16px;display:inline-flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:#6A5F75;}
 </style>
 </head>
 <body>
@@ -235,6 +256,44 @@ const QUOTES = [
   {text:'人間は努力する限り、迷うものだ。',author:'ゲーテ'},
   {text:'やってみせ、言って聞かせて、させてみせ、ほめてやらねば、人は動かじ。',author:'山本五十六'},
 ];
+
+const ACHIEVEMENTS_DEF = [
+  // streak
+  {id:'s1',  cat:'streak',icon:'🌱',title:'初めの一歩',        desc:'1日連続で記録（10分以上）', threshold:1,   type:'streak',major:false},
+  {id:'s3',  cat:'streak',icon:'💪',title:'三日坊主に打ち勝つ',desc:'3日連続で記録',             threshold:3,   type:'streak',major:false},
+  {id:'s7',  cat:'streak',icon:'🔥',title:'継続は力なり',      desc:'7日連続で記録',             threshold:7,   type:'streak',major:false},
+  {id:'s14', cat:'streak',icon:'🌟',title:'2週間達成！',       desc:'14日連続で記録',            threshold:14,  type:'streak',major:false},
+  {id:'s21', cat:'streak',icon:'🏃',title:'3週間の壁を超えた', desc:'21日連続で記録',            threshold:21,  type:'streak',major:true},
+  {id:'s28', cat:'streak',icon:'🎊',title:'1ヶ月!?!?!?',      desc:'28日連続で記録',            threshold:28,  type:'streak',major:true},
+  {id:'s60', cat:'streak',icon:'👑',title:'もう2ヶ月だよ',     desc:'60日連続で記録',            threshold:60,  type:'streak',major:true},
+  {id:'s100',cat:'streak',icon:'🏆',title:'継続の達人',        desc:'100日連続で記録',           threshold:100, type:'streak',major:true},
+  // total focus time
+  {id:'t1h',   cat:'total',icon:'⏰',title:'はじめの1時間',   desc:'合計1時間集中',             threshold:3600,    type:'total',major:false},
+  {id:'t10h',  cat:'total',icon:'📚',title:'10時間達成',      desc:'合計10時間集中',            threshold:36000,   type:'total',major:false},
+  {id:'t50h',  cat:'total',icon:'💡',title:'50時間の軌跡',    desc:'合計50時間集中',            threshold:180000,  type:'total',major:false},
+  {id:'t100h', cat:'total',icon:'🎯',title:'なんと、100時間', desc:'合計100時間集中',           threshold:360000,  type:'total',major:true},
+  {id:'t300h', cat:'total',icon:'🚀',title:'300時間の旅人',   desc:'合計300時間集中',           threshold:1080000, type:'total',major:true},
+  {id:'t500h', cat:'total',icon:'⚡',title:'500時間の猛者',   desc:'合計500時間集中',           threshold:1800000, type:'total',major:true},
+  {id:'t1000h',cat:'total',icon:'🌋',title:'ドヒャーーー！',  desc:'合計1000時間集中',          threshold:3600000, type:'total',major:true},
+  {id:'t3000h',cat:'total',icon:'🌌',title:'努力の達人',      desc:'合計3000時間集中',          threshold:10800000,type:'total',major:true},
+  // weekly
+  {id:'w5h', cat:'weekly',icon:'📅',title:'週5時間達成',       desc:'今週5時間集中',             threshold:18000, type:'weekly',major:false},
+  {id:'w7h', cat:'weekly',icon:'🎮',title:'ゲームは1日1時間！',desc:'今週7時間集中',             threshold:25200, type:'weekly',major:false},
+  {id:'w21h',cat:'weekly',icon:'💼',title:'週21時間の集中力',  desc:'今週21時間集中',            threshold:75600, type:'weekly',major:false},
+  {id:'w35h',cat:'weekly',icon:'🔬',title:'週35時間のプロ',    desc:'今週35時間集中',            threshold:126000,type:'weekly',major:true},
+  {id:'w49h',cat:'weekly',icon:'🦅',title:'週49時間の鬼',      desc:'今週49時間集中',            threshold:176400,type:'weekly',major:true},
+  {id:'w70h',cat:'weekly',icon:'📖',title:'受験生？',          desc:'今週70時間集中',            threshold:252000,type:'weekly',major:true},
+  // misc
+  {id:'m_first', cat:'misc',icon:'✅',title:'最初の完了',          desc:'Todoを初めて完了',          threshold:1,  type:'todo_done',   major:false},
+  {id:'m_perf1', cat:'misc',icon:'⭐',title:'完璧な1日',           desc:'1日全Todo完了',             threshold:1,  type:'perfect_days',major:false},
+  {id:'m_perf7', cat:'misc',icon:'🌈',title:'パーフェクトウィーク', desc:'7日間全Todo完了',           threshold:7,  type:'perfect_days',major:true},
+  {id:'m_perf30',cat:'misc',icon:'💎',title:'30日間の完璧',        desc:'30日間全Todo完了',          threshold:30, type:'perfect_days',major:true},
+  {id:'m_pom1',  cat:'misc',icon:'🍅',title:'初ポモドーロ',         desc:'初めてポモドーロ完了',       threshold:1,  type:'pom',         major:false},
+  {id:'m_pom10', cat:'misc',icon:'🍅',title:'ポモドーロ10回',       desc:'10セッション完了',          threshold:10, type:'pom',         major:false},
+  {id:'m_pom100',cat:'misc',icon:'🍅',title:'ポモドーロの達人',     desc:'100セッション完了',         threshold:100,type:'pom',         major:true},
+  {id:'m_early', cat:'misc',icon:'🌅',title:'早起きは三文の徳',    desc:'6時前にアプリを起動',        threshold:1,  type:'early_bird',  major:false},
+];
+const ACH_CAT_LABELS = {streak:'🔥 連続記録',total:'⏱ 合計集中時間',weekly:'📅 週間集中時間',misc:'🎖 その他'};
 const WORK_TIME = 25*60, BREAK_TIME = 5*60;
 
 // ── utils ────────────────────────────────────────────────────────
@@ -286,11 +345,16 @@ function calcStreak(tl) {
   for(let i=0;i<365;i++){
     const d=new Date(today);d.setDate(today.getDate()-i);
     const key=toKey(d.getFullYear(),d.getMonth(),d.getDate());
-    if(Object.values(tl[key]||{}).reduce((a,b)=>a+b,0)>0)s++;
+    if(Object.values(tl[key]||{}).reduce((a,b)=>a+b,0)>=600)s++;
     else if(i>0)break;
   }
   return s;
 }
+function calcPerfectDays(todos){
+  const td=todayStr();
+  return Object.entries(todos).filter(([k,l])=>k<td&&l&&l.length>0&&l.every(t=>t.done)).length;
+}
+function countTodoDone(todos){return Object.values(todos).flat().filter(t=>t.done).length;}
 
 function buildChart(tl,cats,period) {
   const today=new Date();
@@ -420,6 +484,7 @@ function TimerSection({onchange}) {
   const [showForm,setShowForm]=useState(false);
   const [tcName,setTcName]=useState('');
   const [tcColor,setTcColor]=useState(COLOR_PRESETS[0]);
+  const [tcCustom,setTcCustom]=useState('#C9A8E0');
   const [tl,setTl]=useState(()=>ls.get('kc-timer-log',{}));
 
   useEffect(()=>{ls.set('kc-timer-cats',timerCats);},[timerCats]);
@@ -455,8 +520,10 @@ function TimerSection({onchange}) {
   const addCat=()=>{
     if(!tcName.trim())return;
     const id='tc_'+Date.now();
-    setTimerCats(p=>[...p,{id,label:tcName.trim(),color:tcColor.color,bg:tcColor.bg}]);
-    setActiveCat(id);setTcName('');setTcColor(COLOR_PRESETS[0]);setShowForm(false);
+    const color=tcColor?tcColor.color:tcCustom;
+    const bg=tcColor?tcColor.bg:(tcCustom+'22');
+    setTimerCats(p=>[...p,{id,label:tcName.trim(),color,bg}]);
+    setActiveCat(id);setTcName('');setTcColor(COLOR_PRESETS[0]);setTcCustom('#C9A8E0');setShowForm(false);
   };
   const delCat=(id)=>{setTimerCats(p=>p.filter(c=>c.id!==id));if(activeCat===id)setActiveCat(null);};
   const prog=((WORK_TIME-pomSecs)/WORK_TIME)*100;
@@ -499,7 +566,8 @@ function TimerSection({onchange}) {
       showForm && e('div',{className:'tc-form'},
         e('input',{placeholder:'カテゴリー名',value:tcName,onChange:ev=>setTcName(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter')addCat();}}),
         e('div',{className:'tc-swatches'},
-          COLOR_PRESETS.map((p,i)=>e('span',{key:i,className:'tc-swatch'+(tcColor===p?' picked':''),style:{background:p.color},onClick:()=>setTcColor(p)})),
+          COLOR_PRESETS.map((p,i)=>e('span',{key:i,className:'tc-swatch'+(tcColor===p?' picked':''),style:{background:p.color},onClick:()=>{setTcColor(p);setTcCustom(p.color);}})),
+          e('input',{type:'color',value:tcCustom,onChange:ev=>{setTcCustom(ev.target.value);setTcColor(null);},title:'カスタムカラー'}),
         ),
         e('div',{className:'tc-form-btns'},
           e('button',{className:'nc-save',onClick:addCat},'追加'),
@@ -592,6 +660,7 @@ function CalendarScreen() {
   const [showCatForm,setShowCatForm]=useState(false);
   const [newCatName,setNewCatName]=useState('');
   const [newCatColor,setNewCatColor]=useState(COLOR_PRESETS[0]);
+  const [customColor,setCustomColor]=useState('#C9A8E0');
 
   useEffect(()=>{ls.set('kc-todos',todos);},[todos]);
   useEffect(()=>{ls.set('kc-custom-cats',customCats);},[customCats]);
@@ -624,8 +693,10 @@ function CalendarScreen() {
   const addCat=()=>{
     if(!newCatName.trim())return;
     const id='cat_'+Date.now();
-    setCustomCats(p=>[...p,{id,label:newCatName.trim(),color:newCatColor.color,bg:newCatColor.bg}]);
-    setSelCat(id);setNewCatName('');setNewCatColor(COLOR_PRESETS[0]);setShowCatForm(false);
+    const color=newCatColor?newCatColor.color:customColor;
+    const bg=newCatColor?newCatColor.bg:(customColor+'22');
+    setCustomCats(p=>[...p,{id,label:newCatName.trim(),color,bg}]);
+    setSelCat(id);setNewCatName('');setNewCatColor(COLOR_PRESETS[0]);setCustomColor('#C9A8E0');setShowCatForm(false);
   };
   const delCat=(id)=>{setCustomCats(p=>p.filter(c=>c.id!==id));if(selCat===id)setSelCat('other');};
 
@@ -710,7 +781,8 @@ function CalendarScreen() {
         showCatForm && e('div',{className:'new-cat-form'},
           e('input',{placeholder:'カテゴリー名',value:newCatName,onChange:ev=>setNewCatName(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter')addCat();}}),
           e('div',{className:'color-swatches'},
-            COLOR_PRESETS.map((p,i)=>e('span',{key:i,className:'color-swatch'+(newCatColor===p?' picked':''),style:{background:p.color},onClick:()=>setNewCatColor(p)})),
+            COLOR_PRESETS.map((p,i)=>e('span',{key:i,className:'color-swatch'+(newCatColor===p?' picked':''),style:{background:p.color},onClick:()=>{setNewCatColor(p);setCustomColor(p.color);}})),
+            e('input',{type:'color',value:customColor,onChange:ev=>{setCustomColor(ev.target.value);setNewCatColor(null);},title:'カスタムカラー'}),
           ),
           e('div',{className:'new-cat-actions'},
             e('button',{className:'nc-save',onClick:addCat},'追加'),
@@ -773,6 +845,60 @@ function StatsScreen() {
   );
 }
 
+// ── AchievementsScreen ──────────────────────────────────────────
+function AchievementsScreen() {
+  const tl    = ls.get('kc-timer-log',{});
+  const todos = ls.get('kc-todos',{});
+  const pom   = ls.get('kc-pom-cycles',0);
+  const nowH  = new Date().getHours();
+  const sm = {
+    streak:       calcStreak(tl),
+    total:        getAllTotal(tl),
+    weekly:       getWeekSecs(tl),
+    pom:          pom,
+    perfect_days: calcPerfectDays(todos),
+    todo_done:    countTodoDone(todos),
+    early_bird:   nowH<6?1:0,
+  };
+
+  const isUnlocked = (ach) => (sm[ach.type]||0) >= ach.threshold;
+  const progress   = (ach) => Math.min(1,(sm[ach.type]||0)/ach.threshold);
+  const total   = ACHIEVEMENTS_DEF.length;
+  const unlCnt  = ACHIEVEMENTS_DEF.filter(a=>isUnlocked(a)).length;
+  const cats    = ['streak','total','weekly','misc'];
+
+  return e('div',{className:'ach-page dot-bg'},
+    e('div',{className:'ach-page-title'},
+      '🏆 実績',
+      e('span',{style:{fontSize:'.78rem',fontWeight:600,color:'#9B8FAA',marginLeft:'auto'}},unlCnt+' / '+total+' 解放'),
+    ),
+    e('div',{className:'ach-cats'},
+      cats.map(cat=>{
+        const items=ACHIEVEMENTS_DEF.filter(a=>a.cat===cat);
+        return e('div',{key:cat},
+          e('div',{className:'ach-cat-title'},ACH_CAT_LABELS[cat]),
+          e('div',{className:'ach-grid'},
+            items.map(ach=>{
+              const done=isUnlocked(ach);
+              const prog=progress(ach);
+              return e('div',{key:ach.id,className:'ach-card'+(done?' unlocked':' locked')+(ach.major?' major':'')},
+                e('div',{className:'ach-icon'},done?ach.icon:'🔒'),
+                e('div',{style:{flex:1}},
+                  e('div',{className:'ach-name'},done?ach.title:'???'),
+                  e('div',{className:'ach-desc'},ach.desc),
+                  !done&&prog>0&&e('div',{className:'ach-progress'},
+                    e('div',{className:'ach-progress-fill',style:{width:(prog*100)+'%'}}),
+                  ),
+                ),
+              );
+            }),
+          ),
+        );
+      }),
+    ),
+  );
+}
+
 // ── App ─────────────────────────────────────────────────────────
 function App() {
   const [view,setView]=useState('home');
@@ -795,11 +921,13 @@ function App() {
       e('button',{className:'d-item'+(view==='home'?' active':''),onClick:()=>nav('home')},'🏠 ホーム'),
       e('button',{className:'d-item'+(view==='calendar'?' active':''),onClick:()=>nav('calendar')},'📅 カレンダー'),
       e('button',{className:'d-item'+(view==='stats'?' active':''),onClick:()=>nav('stats')},'📊 統計'),
+      e('button',{className:'d-item'+(view==='achievements'?' active':''),onClick:()=>nav('achievements')},'🏆 実績'),
       e('button',{className:'d-item dim',disabled:true},'⚙️ 設定 ',e('small',{style:{fontSize:'.62rem',marginLeft:2}},'(準備中)')),
     ),
-    view==='home'     && e(HomeScreen,{key:'home',goCalendar:()=>nav('calendar')}),
-    view==='calendar' && e(CalendarScreen,{key:'cal'}),
-    view==='stats'    && e(StatsScreen,{key:'stats'}),
+    view==='home'         && e(HomeScreen,{key:'home',goCalendar:()=>nav('calendar')}),
+    view==='calendar'     && e(CalendarScreen,{key:'cal'}),
+    view==='stats'        && e(StatsScreen,{key:'stats'}),
+    view==='achievements' && e(AchievementsScreen,{key:'ach'}),
   );
 }
 
