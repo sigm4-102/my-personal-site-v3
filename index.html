@@ -304,6 +304,11 @@ const todayStr = () => { const t=new Date(); return toKey(t.getFullYear(),t.getM
 const fmtMS  = s => String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 const fmtHMS = s => String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 const fmtHM  = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?h+'時間'+m+'分':m+'分'; };
+// 16進カラー → rgba文字列
+function hexToRgba(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
 const getGreeting = () => { const h=new Date().getHours(); return h<4?'こんばんは':h<10?'おはようございます':h<17?'こんにちは':'こんばんは'; };
 
 function wInfo(code) {
@@ -341,12 +346,17 @@ function getYearTotal(tl) {
   return Object.entries(tl).filter(([k])=>k.startsWith(y+'-')).reduce((s,[,v])=>s+Object.values(v).reduce((a,b)=>a+b,0),0);
 }
 function calcStreak(tl) {
-  const today=new Date();let s=0;
-  for(let i=0;i<365;i++){
+  const today=new Date();
+  // 今日が10分以上なら今日から、まだなら昨日からカウント開始
+  const todayKey=toKey(today.getFullYear(),today.getMonth(),today.getDate());
+  const todayTotal=Object.values(tl[todayKey]||{}).reduce((a,b)=>a+b,0);
+  const startOffset=todayTotal>=600?0:1; // 今日達成済みなら0日前(今日)から、未達なら1日前(昨日)から
+  let s=0;
+  for(let i=startOffset;i<365;i++){
     const d=new Date(today);d.setDate(today.getDate()-i);
     const key=toKey(d.getFullYear(),d.getMonth(),d.getDate());
     if(Object.values(tl[key]||{}).reduce((a,b)=>a+b,0)>=600)s++;
-    else if(i>0)break;
+    else break;
   }
   return s;
 }
@@ -521,7 +531,7 @@ function TimerSection({onchange}) {
     if(!tcName.trim())return;
     const id='tc_'+Date.now();
     const color=tcColor?tcColor.color:tcCustom;
-    const bg=tcColor?tcColor.bg:(tcCustom+'22');
+    const bg=tcColor?tcColor.bg:hexToRgba(tcCustom,0.15);
     setTimerCats(p=>[...p,{id,label:tcName.trim(),color,bg}]);
     setActiveCat(id);setTcName('');setTcColor(COLOR_PRESETS[0]);setTcCustom('#C9A8E0');setShowForm(false);
   };
@@ -567,7 +577,7 @@ function TimerSection({onchange}) {
         e('input',{placeholder:'カテゴリー名',value:tcName,onChange:ev=>setTcName(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter')addCat();}}),
         e('div',{className:'tc-swatches'},
           COLOR_PRESETS.map((p,i)=>e('span',{key:i,className:'tc-swatch'+(tcColor===p?' picked':''),style:{background:p.color},onClick:()=>{setTcColor(p);setTcCustom(p.color);}})),
-          e('input',{type:'color',value:tcCustom,onChange:ev=>{setTcCustom(ev.target.value);setTcColor(null);},title:'カスタムカラー'}),
+          e('input',{type:'color',value:tcCustom,onChange:ev=>{setTcCustom(ev.target.value);setTcColor(null);},title:'カスタムカラー',style:{outline:tcColor===null?'2.5px solid #333':'none',outlineOffset:'1px'}}),
         ),
         e('div',{className:'tc-form-btns'},
           e('button',{className:'nc-save',onClick:addCat},'追加'),
@@ -694,7 +704,7 @@ function CalendarScreen() {
     if(!newCatName.trim())return;
     const id='cat_'+Date.now();
     const color=newCatColor?newCatColor.color:customColor;
-    const bg=newCatColor?newCatColor.bg:(customColor+'22');
+    const bg=newCatColor?newCatColor.bg:hexToRgba(customColor,0.15);
     setCustomCats(p=>[...p,{id,label:newCatName.trim(),color,bg}]);
     setSelCat(id);setNewCatName('');setNewCatColor(COLOR_PRESETS[0]);setCustomColor('#C9A8E0');setShowCatForm(false);
   };
@@ -782,7 +792,7 @@ function CalendarScreen() {
           e('input',{placeholder:'カテゴリー名',value:newCatName,onChange:ev=>setNewCatName(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter')addCat();}}),
           e('div',{className:'color-swatches'},
             COLOR_PRESETS.map((p,i)=>e('span',{key:i,className:'color-swatch'+(newCatColor===p?' picked':''),style:{background:p.color},onClick:()=>{setNewCatColor(p);setCustomColor(p.color);}})),
-            e('input',{type:'color',value:customColor,onChange:ev=>{setCustomColor(ev.target.value);setNewCatColor(null);},title:'カスタムカラー'}),
+            e('input',{type:'color',value:customColor,onChange:ev=>{setCustomColor(ev.target.value);setNewCatColor(null);},title:'カスタムカラー',style:{outline:newCatColor===null?'2.5px solid #333':'none',outlineOffset:'1px'}}),
           ),
           e('div',{className:'new-cat-actions'},
             e('button',{className:'nc-save',onClick:addCat},'追加'),
@@ -835,6 +845,7 @@ function StatsScreen() {
         e('div',{className:'streak-card'},
           e('div',{className:'streak-num'},streak,'🔥'),
           e('div',{className:'streak-label'},'日連続で記録中'),
+          e('div',{style:{fontSize:'.64rem',color:'#C0B0D0',marginTop:4}},'※ 1日10分以上で記録'),
         ),
         e('div',{className:'quote-card'},
           e('div',{className:'quote-text'},'「'+quote.text+'」'),
